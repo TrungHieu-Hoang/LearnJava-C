@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const testCaseSchema = new mongoose.Schema({
-  input: { type: String, required: true },
+  input: { type: String, default: '' },
   expectedOutput: { type: String, required: true }
 }, { _id: false });
 

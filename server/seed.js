@@ -161,29 +161,60 @@ const generateMoreExercisesForTopic = (topic, allExercises) => {
   const difficulties = ['easy', 'medium', 'hard'];
   const sources = ['Codeforces', 'LeetCode', 'HackerRank', 'VNOJ'];
   const tags = ['math', 'string', 'array', 'sorting', 'greedy', 'dp'];
-  
-  const templates = [
-    { title: 'Tính tổng 2 số', desc: 'Đọc vào 2 số nguyên A và B cách nhau bởi khoảng trắng. In ra A + B.', tests: [{ i: '3 5', o: '8' }, { i: '-1 1', o: '0' }, { i: '10 20', o: '30' }] },
-    { title: 'Kiểm tra Chẵn Lẻ', desc: 'Đọc vào số nguyên dương N. Nếu N chẵn in ra "CHAN", nếu lẻ in ra "LE".', tests: [{ i: '4', o: 'CHAN' }, { i: '7', o: 'LE' }, { i: '100', o: 'CHAN' }] },
-    { title: 'Tính diện tích HCN', desc: 'Đọc vào chiều dài và chiều rộng (số nguyên). In ra diện tích.', tests: [{ i: '3 4', o: '12' }, { i: '5 5', o: '25' }, { i: '10 2', o: '20' }] },
-    { title: 'Tìm Max 3 số', desc: 'Đọc vào 3 số nguyên cách nhau bởi khoảng trắng. In ra số lớn nhất.', tests: [{ i: '1 5 3', o: '5' }, { i: '-1 -5 -3', o: '-1' }, { i: '10 10 10', o: '10' }] },
-    { title: 'Tổng 1 đến N', desc: 'Đọc vào số N. Tính tổng các số từ 1 đến N.', tests: [{ i: '5', o: '15' }, { i: '10', o: '55' }, { i: '100', o: '5050' }] },
-    { title: 'Nhân đôi giá trị', desc: 'Đọc vào số nguyên N. In ra giá trị của N nhân 2.', tests: [{ i: '5', o: '10' }, { i: '-3', o: '-6' }, { i: '12', o: '24' }] }
-  ];
-
   const lang = topic.language;
-  
-  for (let i = 1; i <= 20; i++) {
+  const tTitle = topic.title.toLowerCase();
+
+  for (let i = 1; i <= 10; i++) { // Rút gọn còn 10 bài mỗi topic cho chất lượng
     let starter = '';
     if (lang === 'java') starter = 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Code của bạn ở đây\n        \n    }\n}';
     else if (lang === 'cpp') starter = '#include <iostream>\nusing namespace std;\n\nint main() {\n    // Code của bạn ở đây\n    \n    return 0;\n}';
     else if (lang === 'c') starter = '#include <stdio.h>\n\nint main() {\n    // Code của bạn ở đây\n    \n    return 0;\n}';
     else if (lang === 'python') starter = '# Code của bạn ở đây\n\n';
 
-    const tpl = templates[(i - 1) % templates.length];
+    let tpl = {};
+
+    if (tTitle.includes('làm quen') || tTitle.includes('hello')) {
+      tpl = { 
+        title: `In chuỗi thông điệp #${i}`, 
+        desc: `In ra màn hình chính xác dòng chữ: "Hello CodeCamp ${i}!"`, 
+        tests: [{ i: '', o: `Hello CodeCamp ${i}!` }] 
+      };
+    } else if (tTitle.includes('biến') || tTitle.includes('kiểu')) {
+      const multiplier = i + 1;
+      tpl = { 
+        title: `Phép tính cơ bản nhân ${multiplier}`, 
+        desc: `Đọc vào một số nguyên N. Tính và in ra N * ${multiplier}.`, 
+        tests: [{ i: '2', o: `${2 * multiplier}` }, { i: '5', o: `${5 * multiplier}` }] 
+      };
+    } else if (tTitle.includes('điều kiện') || tTitle.includes('if')) {
+      const limit = i * 10;
+      tpl = { 
+        title: `So sánh với ${limit}`, 
+        desc: `Đọc vào số nguyên N. Nếu N > ${limit} in ra "LON", ngược lại in ra "NHO".`, 
+        tests: [{ i: `${limit + 5}`, o: 'LON' }, { i: `${limit - 5}`, o: 'NHO' }, { i: `${limit}`, o: 'NHO' }] 
+      };
+    } else if (tTitle.includes('vòng lặp') || tTitle.includes('for')) {
+      tpl = { 
+        title: `Vòng lặp tính tổng bội số của ${i}`, 
+        desc: `Đọc vào số nguyên dương N. In ra tổng các số chia hết cho ${i} trong khoảng từ 1 đến N.`, 
+        tests: [{ i: `${i * 3}`, o: `${(i * 1 + i * 2 + i * 3)}` }, { i: `${i * 2 - 1}`, o: `${i}` }] 
+      };
+    } else if (tTitle.includes('mảng') || tTitle.includes('vector')) {
+      tpl = { 
+        title: `Thao tác mảng #${i}`, 
+        desc: `Đọc vào số N, tiếp theo là N số nguyên. In ra số ở vị trí thứ ${i % 3 + 1} của mảng.`, 
+        tests: [{ i: '3\n10 20 30', o: i % 3 === 0 ? '10' : i % 3 === 1 ? '20' : '30' }] 
+      };
+    } else {
+      tpl = { 
+        title: `Bài toán tổng hợp #${i}`, 
+        desc: `Đọc vào 2 số nguyên A và B. In ra A + B + ${i}.`, 
+        tests: [{ i: '3 5', o: `${3 + 5 + i}` }, { i: '10 20', o: `${10 + 20 + i}` }] 
+      };
+    }
 
     allExercises.push({
-      title: `${tpl.title} (Bài ${i})`,
+      title: `${tpl.title}`,
       topicId: topic._id,
       language: lang,
       difficulty: difficulties[Math.floor(Math.random() * difficulties.length)],
