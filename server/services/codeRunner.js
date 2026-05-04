@@ -22,6 +22,10 @@ async function executeCode(language, code, input = '') {
       return await runJava(tmpDir, code, input);
     } else if (language === 'cpp') {
       return await runCpp(tmpDir, code, input);
+    } else if (language === 'c') {
+      return await runC(tmpDir, code, input);
+    } else if (language === 'python') {
+      return await runPython(tmpDir, code, input);
     } else {
       return { stdout: '', stderr: 'Unsupported language', exitCode: 1, timedOut: false };
     }
@@ -147,6 +151,72 @@ async function runCpp(tmpDir, code, input) {
       timedOut: false,
       status: 'error'
     };
+  }
+}
+
+/**
+ * Compile and run C code
+ */
+async function runC(tmpDir, code, input) {
+  const sourceFile = path.join(tmpDir, 'main.c');
+  const outputFile = path.join(tmpDir, os.platform() === 'win32' ? 'main.exe' : 'main');
+  
+  fs.writeFileSync(sourceFile, code);
+
+  // Compile
+  try {
+    await execPromise('gcc', ['-o', outputFile, sourceFile], tmpDir, TIMEOUT_MS);
+  } catch (compileError) {
+    return {
+      stdout: '',
+      stderr: `Compile Error:\n${compileError.stderr || compileError.message}`,
+      exitCode: 1,
+      timedOut: false,
+      status: 'error'
+    };
+  }
+
+  // Run
+  try {
+    const result = await execPromise(outputFile, [], tmpDir, TIMEOUT_MS, input);
+    return {
+      stdout: result.stdout.trim(),
+      stderr: result.stderr,
+      exitCode: 0,
+      timedOut: false,
+      status: 'success'
+    };
+  } catch (runError) {
+    if (runError.timedOut) {
+      return { stdout: '', stderr: 'Time Limit Exceeded (5s)', exitCode: 1, timedOut: true, status: 'tle' };
+    }
+    return { stdout: runError.stdout || '', stderr: `Runtime Error:\n${runError.stderr || runError.message}`, exitCode: 1, timedOut: false, status: 'error' };
+  }
+}
+
+/**
+ * Run Python 3 code
+ */
+async function runPython(tmpDir, code, input) {
+  const sourceFile = path.join(tmpDir, 'main.py');
+  fs.writeFileSync(sourceFile, code);
+
+  // Run
+  try {
+    const pythonCmd = os.platform() === 'win32' ? 'python' : 'python3';
+    const result = await execPromise(pythonCmd, [sourceFile], tmpDir, TIMEOUT_MS, input);
+    return {
+      stdout: result.stdout.trim(),
+      stderr: result.stderr,
+      exitCode: 0,
+      timedOut: false,
+      status: 'success'
+    };
+  } catch (runError) {
+    if (runError.timedOut) {
+      return { stdout: '', stderr: 'Time Limit Exceeded (5s)', exitCode: 1, timedOut: true, status: 'tle' };
+    }
+    return { stdout: runError.stdout || '', stderr: `Runtime Error:\n${runError.stderr || runError.message}`, exitCode: 1, timedOut: false, status: 'error' };
   }
 }
 

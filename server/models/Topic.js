@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
-
 const topicSchema = new mongoose.Schema({
   language: {
     type: String,
     required: true,
-    enum: ['java', 'cpp']
+    enum: ['java', 'cpp', 'c', 'python']
   },
   order: {
     type: Number,

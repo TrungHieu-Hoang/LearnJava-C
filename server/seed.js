@@ -29,6 +29,22 @@ const cppTopics = [
   { language: 'cpp', order: 8, title: 'Algorithms & Sort', theoryHTML: '<h3>Thuật toán</h3><p>Thư viện std::sort, binary_search...</p>', defaultCode: '' }
 ];
 
+const cTopics = [
+  { language: 'c', order: 1, title: 'Bài 0: Hướng dẫn & Làm quen', theoryHTML: '<h3>👋 Chào mừng đến với CodeCamp</h3><p>Nền tảng này giúp bạn vừa học lý thuyết vừa thực hành viết code ngay lập tức.</p><h4>🚀 Cách nộp bài:</h4><p>Bấm <strong>Chạy Code</strong> để test thử với dữ liệu mẫu. Khi đã tự tin, hãy bấm <strong>Nộp Bài</strong> để máy chủ chấm điểm nhé!</p><hr/><h3>⚡ Giới thiệu C</h3><p>C là ngôn ngữ lập trình nền tảng, mạnh mẽ và gần với phần cứng nhất.</p>', defaultCode: '#include <stdio.h>\n\nint main() {\n    printf("Hello CodeCamp!\\n");\n    return 0;\n}' },
+  { language: 'c', order: 2, title: 'Biến & Kiểu dữ liệu', theoryHTML: '<h3>Biến trong C</h3><p>int, float, double, char...</p>', defaultCode: '' },
+  { language: 'c', order: 3, title: 'Điều kiện', theoryHTML: '<h3>if/else, switch</h3><p>Rẽ nhánh chương trình...</p>', defaultCode: '' },
+  { language: 'c', order: 4, title: 'Vòng lặp', theoryHTML: '<h3>for, while, do-while</h3><p>Lặp lại khối lệnh...</p>', defaultCode: '' },
+  { language: 'c', order: 5, title: 'Hàm & Con trỏ', theoryHTML: '<h3>Hàm & Con trỏ (Pointers)</h3><p>Con trỏ là khái niệm linh hồn của C...</p>', defaultCode: '' }
+];
+
+const pythonTopics = [
+  { language: 'python', order: 1, title: 'Bài 0: Hướng dẫn & Làm quen', theoryHTML: '<h3>👋 Chào mừng đến với CodeCamp</h3><p>Nền tảng này giúp bạn vừa học lý thuyết vừa thực hành viết code ngay lập tức.</p><h4>🚀 Cách nộp bài:</h4><p>Bấm <strong>Chạy Code</strong> để test thử với dữ liệu mẫu. Khi đã tự tin, hãy bấm <strong>Nộp Bài</strong> để máy chủ chấm điểm nhé!</p><hr/><h3>🐍 Giới thiệu Python</h3><p>Python là ngôn ngữ cực kỳ dễ học, cú pháp ngắn gọn và rất mạnh mẽ trong AI/Data.</p>', defaultCode: '# Hãy bấm nút "Chạy code" để xem kết quả nhé:\nprint("Hello CodeCamp!")' },
+  { language: 'python', order: 2, title: 'Biến & Kiểu dữ liệu', theoryHTML: '<h3>Biến trong Python</h3><p>int, float, str, bool...</p>', defaultCode: '' },
+  { language: 'python', order: 3, title: 'Điều kiện', theoryHTML: '<h3>if/elif/else</h3><p>Rẽ nhánh chương trình...</p>', defaultCode: '' },
+  { language: 'python', order: 4, title: 'Vòng lặp', theoryHTML: '<h3>for, while</h3><p>Lặp lại khối lệnh...</p>', defaultCode: '' },
+  { language: 'python', order: 5, title: 'Cấu trúc dữ liệu', theoryHTML: '<h3>List, Tuple, Set, Dict</h3><p>Lưu trữ và xử lý dữ liệu linh hoạt...</p>', defaultCode: '' }
+];
+
 const exercises = [
   // Java Exercises
   {
@@ -142,24 +158,27 @@ const exercises = [
 
 // Hàm tạo thêm bài tập để đủ 20 bài mỗi ngôn ngữ
 const generateMoreExercises = () => {
-  const sources = ['LeetCode', 'HackerRank', 'Codeforces', 'VNOJ', 'GeeksforGeeks'];
+  const langs = ['java', 'cpp', 'c', 'python'];
   const difficulties = ['easy', 'medium', 'hard'];
-  const tags = ['array', 'math', 'string', 'sorting', 'dp', 'graph', 'tree'];
-  
-  const langs = ['java', 'cpp'];
+  const sources = ['Codeforces', 'LeetCode', 'HackerRank', 'VNOJ'];
+  const tags = ['math', 'string', 'array', 'sorting', 'greedy', 'dp'];
   
   langs.forEach(lang => {
     const currentCount = exercises.filter(e => e.language === lang).length;
     for (let i = currentCount + 1; i <= 20; i++) {
+      let starter = '';
+      if (lang === 'java') starter = 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(sc.hasNextInt()) System.out.println(sc.nextInt() * 2);\n    }\n}';
+      else if (lang === 'cpp') starter = '#include <iostream>\nusing namespace std;\n\nint main() {\n    int n; if(cin >> n) cout << n * 2;\n    return 0;\n}';
+      else if (lang === 'c') starter = '#include <stdio.h>\n\nint main() {\n    int n; if(scanf("%d", &n) == 1) printf("%d\\n", n * 2);\n    return 0;\n}';
+      else if (lang === 'python') starter = 'try:\n    n = int(input())\n    print(n * 2)\nexcept:\n    pass';
+
       exercises.push({
         title: `Bài tập tự động ${lang.toUpperCase()} #${i}`,
         language: lang,
         difficulty: difficulties[Math.floor(Math.random() * difficulties.length)],
         source: sources[Math.floor(Math.random() * sources.length)],
         description: `Đây là mô tả cho bài tập tự động #${i}. Viết chương trình đọc vào 1 số và in ra số đó nhân 2.`,
-        starterCode: lang === 'java' 
-          ? 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(sc.hasNextInt()) System.out.println(sc.nextInt() * 2);\n    }\n}'
-          : '#include <iostream>\nusing namespace std;\n\nint main() {\n    int n; if(cin >> n) cout << n * 2;\n    return 0;\n}',
+        starterCode: starter,
         testCases: [
           { input: '5', expectedOutput: '10' },
           { input: '12', expectedOutput: '24' },
@@ -185,6 +204,8 @@ const seedDB = async () => {
     // Thêm các topics
     await Topic.insertMany(javaTopics);
     await Topic.insertMany(cppTopics);
+    await Topic.insertMany(cTopics);
+    await Topic.insertMany(pythonTopics);
     console.log('Topics seeded');
 
     // Thêm các exercises

@@ -13,7 +13,7 @@ const exerciseSchema = new mongoose.Schema({
   language: {
     type: String,
     required: true,
-    enum: ['java', 'cpp']
+    enum: ['java', 'cpp', 'c', 'python']
   },
   difficulty: {
     type: String,
