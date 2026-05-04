@@ -122,7 +122,7 @@ const IDEPanel = ({ exercise, defaultCode, language }) => {
           options={{
             minimap: { enabled: false },
             fontSize: 14,
-            fontFamily: 'Fira Code',
+            fontFamily: "'Consolas', 'Courier New', monospace",
             lineNumbers: 'on',
             scrollBeyondLastLine: false,
             roundedSelection: false,
