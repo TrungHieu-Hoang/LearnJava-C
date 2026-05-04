@@ -24,7 +24,7 @@ router.post('/run', auth, runLimiter, async (req, res) => {
       return res.status(400).json({ message: 'Vui lòng cung cấp code và ngôn ngữ' });
     }
 
-    if (!['java', 'cpp'].includes(language)) {
+    if (!['java', 'cpp', 'c', 'python'].includes(language)) {
       return res.status(400).json({ message: 'Ngôn ngữ không hỗ trợ' });
     }
 
