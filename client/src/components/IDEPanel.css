@@ -1,0 +1,147 @@
+.ide-panel {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 100px);
+  position: sticky;
+  top: 80px;
+  overflow: hidden;
+}
+
+.ide-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ide-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.ide-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.ide-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+.editor-container {
+  flex: 1;
+  min-height: 300px;
+}
+
+/* Override Monaco Editor Background to blend with glassmorphism */
+.monaco-editor, .monaco-editor-background, .monaco-editor .inputarea.ime-input {
+  background-color: transparent !important;
+}
+.monaco-editor .margin {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+.console-panel {
+  height: 250px;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border-color);
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.console-header {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.console-content {
+  flex: 1;
+  padding: 1rem 1.25rem;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.console-content.success pre {
+  color: var(--success);
+}
+
+.console-content.error pre {
+  color: var(--error);
+}
+
+.console-content.tle pre {
+  color: var(--warning);
+}
+
+.test-results {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.test-results h4 {
+  font-size: 0.9rem;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+
+.test-case-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.test-case-card.passed {
+  border-left: 3px solid var(--success);
+}
+
+.test-case-card.failed {
+  border-left: 3px solid var(--error);
+}
+
+.test-case-header {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.test-case-details {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.test-case-details pre {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  margin-top: 0.25rem;
+  color: var(--text-main);
+}
+
+.test-error pre {
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
