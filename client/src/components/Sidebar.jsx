@@ -5,7 +5,7 @@ import './Sidebar.css';
 const Sidebar = ({ language, setLanguage, topics, activeTopic, setActiveTopic }) => {
   return (
     <aside className="sidebar glass-panel">
-      <div className="language-selector">
+      <div className="language-selector" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.25rem' }}>
         <button 
           className={`lang-btn ${language === 'java' ? 'active' : ''}`}
           onClick={() => setLanguage('java')}
@@ -17,6 +17,18 @@ const Sidebar = ({ language, setLanguage, topics, activeTopic, setActiveTopic })
           onClick={() => setLanguage('cpp')}
         >
           C++
+        </button>
+        <button 
+          className={`lang-btn ${language === 'c' ? 'active' : ''}`}
+          onClick={() => setLanguage('c')}
+        >
+          C
+        </button>
+        <button 
+          className={`lang-btn ${language === 'python' ? 'active' : ''}`}
+          onClick={() => setLanguage('python')}
+        >
+          Python
         </button>
       </div>
 
