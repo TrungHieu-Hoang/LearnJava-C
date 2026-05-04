@@ -28,9 +28,10 @@ const ExerciseDetail = ({ exercise, onBack }) => {
           ))}
         </div>
 
-        <div className="exercise-desc">
-          <p>{exercise.description}</p>
-        </div>
+        <div 
+          className="exercise-desc"
+          dangerouslySetInnerHTML={{ __html: exercise.description }}
+        ></div>
 
         <div className="test-cases-preview">
           <h3>Test Cases Mẫu</h3>

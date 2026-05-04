@@ -176,40 +176,95 @@ const generateMoreExercisesForTopic = (topic, allExercises) => {
     if (tTitle.includes('làm quen') || tTitle.includes('hello')) {
       tpl = { 
         title: `In chuỗi thông điệp #${i}`, 
-        desc: `In ra màn hình chính xác dòng chữ: "Hello CodeCamp ${i}!"`, 
-        tests: [{ i: '', o: `Hello CodeCamp ${i}!` }] 
+        desc: `<p>Bạn hãy viết chương trình in ra màn hình chính xác dòng chữ: <code>Hello CodeCamp ${i}!</code></p>
+               <h4>Dữ liệu vào:</h4><ul><li>Không có dữ liệu đầu vào.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>Một dòng duy nhất chứa thông điệp cần in.</li></ul>
+               <h4>Giới hạn:</h4><ul><li>Thời gian thực thi: 1.0s</li><li>Bộ nhớ: 256MB</li></ul>`, 
+        tests: [
+          { i: '', o: `Hello CodeCamp ${i}!` },
+          { i: ' ', o: `Hello CodeCamp ${i}!` },
+          { i: '\n', o: `Hello CodeCamp ${i}!` },
+          { i: 'test', o: `Hello CodeCamp ${i}!` },
+          { i: '123', o: `Hello CodeCamp ${i}!` }
+        ] 
       };
     } else if (tTitle.includes('biến') || tTitle.includes('kiểu')) {
       const multiplier = i + 1;
       tpl = { 
         title: `Phép tính cơ bản nhân ${multiplier}`, 
-        desc: `Đọc vào một số nguyên N. Tính và in ra N * ${multiplier}.`, 
-        tests: [{ i: '2', o: `${2 * multiplier}` }, { i: '5', o: `${5 * multiplier}` }] 
+        desc: `<p>Cho một số nguyên <code>N</code>. Bạn hãy tính và in ra kết quả của phép toán <code>N * ${multiplier}</code>.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Gồm một dòng duy nhất chứa số nguyên <code>N</code>.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>In ra một số nguyên duy nhất là đáp án của bài toán.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>-10^6 &lt;= N &lt;= 10^6</code></li></ul>`, 
+        tests: [
+          { i: '2', o: `${2 * multiplier}` }, 
+          { i: '5', o: `${5 * multiplier}` },
+          { i: '-10', o: `${-10 * multiplier}` },
+          { i: '0', o: '0' },
+          { i: '1000', o: `${1000 * multiplier}` },
+          { i: '-99', o: `${-99 * multiplier}` }
+        ] 
       };
     } else if (tTitle.includes('điều kiện') || tTitle.includes('if')) {
       const limit = i * 10;
       tpl = { 
         title: `So sánh với ${limit}`, 
-        desc: `Đọc vào số nguyên N. Nếu N > ${limit} in ra "LON", ngược lại in ra "NHO".`, 
-        tests: [{ i: `${limit + 5}`, o: 'LON' }, { i: `${limit - 5}`, o: 'NHO' }, { i: `${limit}`, o: 'NHO' }] 
+        desc: `<p>Cho số nguyên <code>N</code>. Nếu <code>N &gt; ${limit}</code> in ra <code>LON</code>, nếu <code>N &lt; ${limit}</code> in ra <code>NHO</code>, nếu bằng nhau in <code>BANG</code>.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Số nguyên <code>N</code> duy nhất trên một dòng.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>In ra chuỗi tương ứng (LON/NHO/BANG).</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>-10^9 &lt;= N &lt;= 10^9</code></li></ul>`, 
+        tests: [
+          { i: `${limit + 5}`, o: 'LON' }, 
+          { i: `${limit - 5}`, o: 'NHO' }, 
+          { i: `${limit}`, o: 'BANG' },
+          { i: `${limit + 100}`, o: 'LON' },
+          { i: `-100`, o: (limit > -100 ? 'NHO' : 'LON') }
+        ] 
       };
     } else if (tTitle.includes('vòng lặp') || tTitle.includes('for')) {
       tpl = { 
-        title: `Vòng lặp tính tổng bội số của ${i}`, 
-        desc: `Đọc vào số nguyên dương N. In ra tổng các số chia hết cho ${i} trong khoảng từ 1 đến N.`, 
-        tests: [{ i: `${i * 3}`, o: `${(i * 1 + i * 2 + i * 3)}` }, { i: `${i * 2 - 1}`, o: `${i}` }] 
+        title: `Vòng lặp bội số của ${i}`, 
+        desc: `<p>Cho số nguyên dương <code>N</code>. Tính tổng các số từ 1 đến <code>N</code> mà chia hết cho <code>${i}</code>.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Một số nguyên dương <code>N</code>.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>Một số nguyên là tổng tìm được.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>1 &lt;= N &lt;= 10000</code></li></ul>`, 
+        tests: [
+          { i: `${i * 3}`, o: `${(i * 1 + i * 2 + i * 3)}` }, 
+          { i: `${i * 5}`, o: `${(i * 1 + i * 2 + i * 3 + i * 4 + i * 5)}` },
+          { i: `${i - 1 || 1}`, o: '0' },
+          { i: `${i * 10}`, o: `${i * 55}` },
+          { i: `${i}`, o: `${i}` }
+        ] 
       };
     } else if (tTitle.includes('mảng') || tTitle.includes('vector')) {
       tpl = { 
-        title: `Thao tác mảng #${i}`, 
-        desc: `Đọc vào số N, tiếp theo là N số nguyên. In ra số ở vị trí thứ ${i % 3 + 1} của mảng.`, 
-        tests: [{ i: '3\n10 20 30', o: i % 3 === 0 ? '10' : i % 3 === 1 ? '20' : '30' }] 
+        title: `Truy xuất phần tử mảng #${i}`, 
+        desc: `<p>Cho mảng <code>A</code> có <code>N</code> phần tử. Hãy in ra phần tử ở vị trí thứ <code>${i % 3 + 1}</code> (tính từ 1).</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Dòng 1: Số nguyên <code>N</code>.</li><li>Dòng 2: <code>N</code> số nguyên cách nhau bởi dấu cách.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>Phần tử ở vị trí yêu cầu.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>3 &lt;= N &lt;= 10^5</code></li><li><code>|A[i]| &lt;= 10^9</code></li></ul>`, 
+        tests: [
+          { i: '3\n10 20 30', o: i % 3 === 0 ? '10' : i % 3 === 1 ? '20' : '30' },
+          { i: '5\n5 1 9 4 2', o: i % 3 === 0 ? '5' : i % 3 === 1 ? '1' : '9' },
+          { i: '4\n-1 -5 0 8', o: i % 3 === 0 ? '-1' : i % 3 === 1 ? '-5' : '0' },
+          { i: '3\n7 7 7', o: '7' },
+          { i: '6\n1 2 3 4 5 6', o: i % 3 === 0 ? '1' : i % 3 === 1 ? '2' : '3' }
+        ] 
       };
     } else {
       tpl = { 
-        title: `Bài toán tổng hợp #${i}`, 
-        desc: `Đọc vào 2 số nguyên A và B. In ra A + B + ${i}.`, 
-        tests: [{ i: '3 5', o: `${3 + 5 + i}` }, { i: '10 20', o: `${10 + 20 + i}` }] 
+        title: `Phép cộng 3 số #${i}`, 
+        desc: `<p>Đọc vào 2 số nguyên <code>A</code> và <code>B</code>. In ra tổng <code>A + B + ${i}</code>.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Hai số nguyên <code>A, B</code> cách nhau bởi dấu cách.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>Một số nguyên là kết quả.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>-10^9 &lt;= A, B &lt;= 10^9</code></li></ul>`, 
+        tests: [
+          { i: '3 5', o: `${3 + 5 + i}` }, 
+          { i: '10 20', o: `${10 + 20 + i}` },
+          { i: '-5 5', o: `${i}` },
+          { i: '0 0', o: `${i}` },
+          { i: '100 200', o: `${300 + i}` }
+        ] 
       };
     }
 
