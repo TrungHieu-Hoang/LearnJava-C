@@ -110,3 +110,13 @@
   font-size: 0.95rem;
   transition: color 0.2s;
 }
+
+@media (max-width: 1024px) {
+  .sidebar {
+    height: auto;
+    max-height: 350px;
+    position: relative;
+    top: 0;
+    margin-bottom: 1rem;
+  }
+}

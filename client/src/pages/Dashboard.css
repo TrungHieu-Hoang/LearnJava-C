@@ -65,16 +65,46 @@
 @media (max-width: 1024px) {
   .dashboard-layout {
     flex-direction: column;
+    padding: 0 0.5rem 1rem;
   }
   
-  .col-sidebar, .col-content, .col-ide {
-    position: static;
+  .col-sidebar {
+    position: relative;
+    top: 0;
     height: auto;
+    max-height: 350px;
     width: 100%;
     flex: none;
   }
   
+  .col-content {
+    position: relative;
+    top: 0;
+    height: auto;
+    min-height: 500px;
+    width: 100%;
+    flex: none;
+    overflow: visible;
+  }
+  
   .col-ide {
-    height: 800px;
+    position: relative;
+    top: 0;
+    height: 600px;
+    width: 100%;
+    min-width: 100%;
+    flex: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .col-ide {
+    height: 500px;
+  }
+  .theory-panel {
+    padding: 1rem;
+  }
+  .exercise-card {
+    padding: 1rem;
   }
 }

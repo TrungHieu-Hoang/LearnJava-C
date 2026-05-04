@@ -1,4 +1,6 @@
 require('dotenv').config();
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']); // Ép dùng Google DNS để vượt lỗi querySrv
 const mongoose = require('mongoose');
 const User = require('./models/User');
 const Topic = require('./models/Topic');
