@@ -156,39 +156,45 @@ const exercises = [
   }
 ];
 
-// Hàm tạo thêm bài tập để đủ 20 bài mỗi ngôn ngữ
-const generateMoreExercises = () => {
-  const langs = ['java', 'cpp', 'c', 'python'];
+// Hàm tạo thêm bài tập đa dạng cho từng topic
+const generateMoreExercisesForTopic = (topic, allExercises) => {
   const difficulties = ['easy', 'medium', 'hard'];
   const sources = ['Codeforces', 'LeetCode', 'HackerRank', 'VNOJ'];
   const tags = ['math', 'string', 'array', 'sorting', 'greedy', 'dp'];
   
-  langs.forEach(lang => {
-    const currentCount = exercises.filter(e => e.language === lang).length;
-    for (let i = currentCount + 1; i <= 20; i++) {
-      let starter = '';
-      if (lang === 'java') starter = 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        if(sc.hasNextInt()) System.out.println(sc.nextInt() * 2);\n    }\n}';
-      else if (lang === 'cpp') starter = '#include <iostream>\nusing namespace std;\n\nint main() {\n    int n; if(cin >> n) cout << n * 2;\n    return 0;\n}';
-      else if (lang === 'c') starter = '#include <stdio.h>\n\nint main() {\n    int n; if(scanf("%d", &n) == 1) printf("%d\\n", n * 2);\n    return 0;\n}';
-      else if (lang === 'python') starter = 'try:\n    n = int(input())\n    print(n * 2)\nexcept:\n    pass';
+  const templates = [
+    { title: 'Tính tổng 2 số', desc: 'Đọc vào 2 số nguyên A và B cách nhau bởi khoảng trắng. In ra A + B.', tests: [{ i: '3 5', o: '8' }, { i: '-1 1', o: '0' }, { i: '10 20', o: '30' }] },
+    { title: 'Kiểm tra Chẵn Lẻ', desc: 'Đọc vào số nguyên dương N. Nếu N chẵn in ra "CHAN", nếu lẻ in ra "LE".', tests: [{ i: '4', o: 'CHAN' }, { i: '7', o: 'LE' }, { i: '100', o: 'CHAN' }] },
+    { title: 'Tính diện tích HCN', desc: 'Đọc vào chiều dài và chiều rộng (số nguyên). In ra diện tích.', tests: [{ i: '3 4', o: '12' }, { i: '5 5', o: '25' }, { i: '10 2', o: '20' }] },
+    { title: 'Tìm Max 3 số', desc: 'Đọc vào 3 số nguyên cách nhau bởi khoảng trắng. In ra số lớn nhất.', tests: [{ i: '1 5 3', o: '5' }, { i: '-1 -5 -3', o: '-1' }, { i: '10 10 10', o: '10' }] },
+    { title: 'Tổng 1 đến N', desc: 'Đọc vào số N. Tính tổng các số từ 1 đến N.', tests: [{ i: '5', o: '15' }, { i: '10', o: '55' }, { i: '100', o: '5050' }] },
+    { title: 'Nhân đôi giá trị', desc: 'Đọc vào số nguyên N. In ra giá trị của N nhân 2.', tests: [{ i: '5', o: '10' }, { i: '-3', o: '-6' }, { i: '12', o: '24' }] }
+  ];
 
-      exercises.push({
-        title: `Bài tập tự động ${lang.toUpperCase()} #${i}`,
-        language: lang,
-        difficulty: difficulties[Math.floor(Math.random() * difficulties.length)],
-        source: sources[Math.floor(Math.random() * sources.length)],
-        description: `Đây là mô tả cho bài tập tự động #${i}. Viết chương trình đọc vào 1 số và in ra số đó nhân 2.`,
-        starterCode: starter,
-        testCases: [
-          { input: '5', expectedOutput: '10' },
-          { input: '12', expectedOutput: '24' },
-          { input: '-3', expectedOutput: '-6' }
-        ],
-        points: Math.floor(Math.random() * 20) + 10,
-        tags: [tags[Math.floor(Math.random() * tags.length)]]
-      });
-    }
-  });
+  const lang = topic.language;
+  
+  for (let i = 1; i <= 20; i++) {
+    let starter = '';
+    if (lang === 'java') starter = 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Code của bạn ở đây\n        \n    }\n}';
+    else if (lang === 'cpp') starter = '#include <iostream>\nusing namespace std;\n\nint main() {\n    // Code của bạn ở đây\n    \n    return 0;\n}';
+    else if (lang === 'c') starter = '#include <stdio.h>\n\nint main() {\n    // Code của bạn ở đây\n    \n    return 0;\n}';
+    else if (lang === 'python') starter = '# Code của bạn ở đây\n\n';
+
+    const tpl = templates[(i - 1) % templates.length];
+
+    allExercises.push({
+      title: `${tpl.title} (Bài ${i})`,
+      topicId: topic._id,
+      language: lang,
+      difficulty: difficulties[Math.floor(Math.random() * difficulties.length)],
+      source: sources[Math.floor(Math.random() * sources.length)],
+      description: tpl.desc,
+      starterCode: starter,
+      testCases: tpl.tests.map(t => ({ input: t.i, expectedOutput: t.o })),
+      points: Math.floor(Math.random() * 20) + 10,
+      tags: [tags[Math.floor(Math.random() * tags.length)]]
+    });
+  }
 };
 
 const seedDB = async () => {
@@ -202,16 +208,22 @@ const seedDB = async () => {
     await Submission.deleteMany({});
     
     // Thêm các topics
-    await Topic.insertMany(javaTopics);
-    await Topic.insertMany(cppTopics);
-    await Topic.insertMany(cTopics);
-    await Topic.insertMany(pythonTopics);
+    const insertedJavaTopics = await Topic.insertMany(javaTopics);
+    const insertedCppTopics = await Topic.insertMany(cppTopics);
+    const insertedCTopics = await Topic.insertMany(cTopics);
+    const insertedPythonTopics = await Topic.insertMany(pythonTopics);
+    
+    const allTopics = [...insertedJavaTopics, ...insertedCppTopics, ...insertedCTopics, ...insertedPythonTopics];
     console.log('Topics seeded');
 
     // Thêm các exercises
-    generateMoreExercises();
-    await Exercise.insertMany(exercises);
-    console.log(`Exercises seeded (${exercises.length} bài tập)`);
+    const allExercises = [];
+    allTopics.forEach(topic => {
+      generateMoreExercisesForTopic(topic, allExercises);
+    });
+    
+    await Exercise.insertMany(allExercises);
+    console.log(`Exercises seeded (${allExercises.length} bài tập)`);
 
     console.log('Seed completed successfully!');
     process.exit(0);

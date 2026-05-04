@@ -10,6 +10,11 @@ const exerciseSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  topicId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Topic',
+    required: false
+  },
   language: {
     type: String,
     required: true,

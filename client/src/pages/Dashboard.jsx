@@ -39,7 +39,8 @@ const Dashboard = () => {
     const fetchExercises = async () => {
       setIsLoading(true);
       try {
-        const res = await api.get(`/exercises?lang=${language}`);
+        if (!activeTopic) return;
+        const res = await api.get(`/exercises?topicId=${activeTopic._id}`);
         setExercises(res.data.exercises);
       } catch (err) {
         console.error('Error fetching exercises:', err);
@@ -47,9 +48,13 @@ const Dashboard = () => {
         setIsLoading(false);
       }
     };
-    fetchExercises();
-    setActiveExercise(null); // Reset when language changes
-  }, [language]);
+    };
+    if (activeTopic) {
+      fetchExercises();
+    } else {
+      setExercises([]);
+    }
+  }, [activeTopic]);
 
   const fetchTopicDetail = async (topicId) => {
     try {

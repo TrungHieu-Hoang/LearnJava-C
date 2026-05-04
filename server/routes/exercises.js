@@ -7,10 +7,11 @@ const router = express.Router();
 // GET /api/exercises?lang=java&difficulty=easy&source=LeetCode
 router.get('/', async (req, res) => {
   try {
-    const { lang, difficulty, source, search } = req.query;
+    const { lang, difficulty, source, search, topicId } = req.query;
     const filter = {};
 
     if (lang) filter.language = lang;
+    if (topicId) filter.topicId = topicId;
     if (difficulty) filter.difficulty = difficulty;
     if (source) filter.source = source;
     if (search) {
