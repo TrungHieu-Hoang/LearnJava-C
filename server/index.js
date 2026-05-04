@@ -46,4 +46,10 @@ mongoose.connect(process.env.MONGO_URI)
     process.exit(1);
   });
 
+// Keep Render server awake
+const https = require('https');
+setInterval(() => {
+  https.get('https://learnjava-c.onrender.com/api/health');
+}, 14 * 60 * 1000); // 14 phút gọi 1 lần
+
 module.exports = app;
