@@ -48,7 +48,6 @@ const Dashboard = () => {
         setIsLoading(false);
       }
     };
-    };
     if (activeTopic) {
       fetchExercises();
     } else {

@@ -59,6 +59,30 @@
   background: rgba(0, 0, 0, 0.5);
 }
 
+.custom-input-panel {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border-color);
+  background: rgba(0, 0, 0, 0.5);
+  height: 100px;
+}
+
+.custom-input-textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  padding: 0.5rem 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  resize: none;
+  outline: none;
+}
+
+.custom-input-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
 .console-header {
   padding: 0.5rem 1.25rem;
   font-size: 0.85rem;

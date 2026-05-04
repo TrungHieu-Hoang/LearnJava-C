@@ -11,12 +11,14 @@ const IDEPanel = ({ exercise, defaultCode, language }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [testResults, setTestResults] = useState(null);
   const [status, setStatus] = useState(null);
+  const [customInput, setCustomInput] = useState('');
 
   useEffect(() => {
     setCode(defaultCode || '');
     setOutput('');
     setTestResults(null);
     setStatus(null);
+    setCustomInput('');
   }, [exercise, defaultCode, language]);
 
   const handleRun = async () => {
@@ -27,9 +29,8 @@ const IDEPanel = ({ exercise, defaultCode, language }) => {
     setStatus(null);
     
     try {
-      // Run with first test case input if available
-      const input = exercise?.testCases?.[0]?.input || '';
-      const res = await api.post('/submissions/run', { code, language, input });
+      // Run with custom input from textarea
+      const res = await api.post('/submissions/run', { code, language, input: customInput });
       
       let outText = res.data.output;
       if (res.data.error) {
@@ -129,6 +130,17 @@ const IDEPanel = ({ exercise, defaultCode, language }) => {
             padding: { top: 16 }
           }}
         />
+      </div>
+      
+      <div className="custom-input-panel">
+        <div className="console-header" style={{ borderTop: 'none' }}>Nhập dữ liệu tự chọn (Custom Input)</div>
+        <textarea 
+          className="custom-input-textarea"
+          placeholder="Nhập các giá trị đầu vào cho code của bạn ở đây..."
+          value={customInput}
+          onChange={(e) => setCustomInput(e.target.value)}
+          spellCheck="false"
+        ></textarea>
       </div>
       
       <div className="console-panel">
