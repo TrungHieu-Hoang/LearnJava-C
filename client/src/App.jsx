@@ -3,6 +3,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Leaderboard from './pages/Leaderboard';
+import Tutorials from './pages/Tutorials';
 import { useAuth } from './context/AuthContext';
 
 function App() {
@@ -36,6 +37,10 @@ function App() {
           <Route 
             path="/leaderboard" 
             element={user ? <Leaderboard /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/tutorials" 
+            element={user ? <Tutorials /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/" 

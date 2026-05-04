@@ -21,7 +21,8 @@ const Navbar = () => {
       </div>
 
       <div className="nav-menu">
-        <Link to="/dashboard" className="nav-item">Học tập</Link>
+        <Link to="/tutorials" className="nav-item">Giáo trình</Link>
+        <Link to="/dashboard" className="nav-item">Thực hành</Link>
         <Link to="/leaderboard" className="nav-item">Bảng xếp hạng</Link>
       </div>
 
