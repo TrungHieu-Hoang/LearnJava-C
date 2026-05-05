@@ -4,6 +4,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Leaderboard from './pages/Leaderboard';
 import Tutorials from './pages/Tutorials';
+import Submissions from './pages/Submissions';
 import { useAuth } from './context/AuthContext';
 
 function App() {
@@ -41,6 +42,10 @@ function App() {
           <Route 
             path="/tutorials" 
             element={user ? <Tutorials /> : <Navigate to="/login" />} 
+          />
+          <Route 
+            path="/submissions" 
+            element={user ? <Submissions /> : <Navigate to="/login" />} 
           />
           <Route 
             path="/" 
