@@ -52,7 +52,7 @@
 }
 
 .console-panel {
-  height: 250px;
+  height: 350px;
   display: flex;
   flex-direction: column;
   border-top: 1px solid var(--border-color);

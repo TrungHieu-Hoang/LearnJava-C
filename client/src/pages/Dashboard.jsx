@@ -15,6 +15,41 @@ const Dashboard = () => {
   const [activeTopic, setActiveTopic] = useState(null);
   const [activeExercise, setActiveExercise] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [ideWidth, setIdeWidth] = useState(600); // Chiều rộng mặc định của IDE
+  const [isResizing, setIsResizing] = useState(false);
+
+  // Xử lý kéo thả để resize IDE
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizing) return;
+      const newWidth = window.innerWidth - e.clientX - 16; // 16px là padding container
+      if (newWidth > 350 && newWidth < window.innerWidth - 300) {
+        setIdeWidth(newWidth);
+      }
+    };
+
+    const handleMouseUp = () => setIsResizing(false);
+
+    if (isResizing) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    } else {
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
+
+  const startResize = (e) => {
+    setIsResizing(true);
+    e.preventDefault();
+  };
 
   // Fetch topics
   useEffect(() => {
@@ -123,8 +158,16 @@ const Dashboard = () => {
           )}
         </div>
 
+        {/* Resizer Handle */}
+        <div 
+          className={`layout-resizer ${isResizing ? 'resizing' : ''}`} 
+          onMouseDown={startResize}
+        >
+          <div className="resizer-dots"></div>
+        </div>
+
         {/* Right Column: IDE */}
-        <div className="col-ide">
+        <div className="col-ide" style={{ '--ide-width': `${ideWidth}px` }}>
           <IDEPanel 
             exercise={activeExercise} 
             defaultCode={activeExercise ? activeExercise.starterCode : activeTopic?.defaultCode}

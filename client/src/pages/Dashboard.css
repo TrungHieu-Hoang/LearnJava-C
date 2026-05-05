@@ -26,8 +26,36 @@
 }
 
 .col-ide {
-  flex: 0 0 45%;
-  min-width: 500px;
+  min-width: 350px;
+  flex: 0 0 var(--ide-width, 600px);
+  max-width: var(--ide-width, 600px);
+}
+
+.layout-resizer {
+  width: 12px;
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 -6px;
+  z-index: 10;
+  transition: background-color 0.2s;
+  border-radius: 6px;
+}
+
+.layout-resizer:hover, .layout-resizer.resizing {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.resizer-dots {
+  height: 30px;
+  width: 4px;
+  background-color: var(--border-color);
+  border-radius: 2px;
+}
+
+.layout-resizer:hover .resizer-dots, .layout-resizer.resizing .resizer-dots {
+  background-color: var(--primary-light);
 }
 
 .theory-exercise-split {
