@@ -1,308 +1,161 @@
-const { execFile, spawn } = require('child_process');
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const { v4: uuidv4 } = require('uuid');
+const https = require('https');
+const http = require('http');
 
-const TIMEOUT_MS = 5000; // 5 seconds
-const MAX_OUTPUT_SIZE = 1024 * 256; // 256KB
+const TIMEOUT_MS = 10000; // 10 seconds for API call
 
-/**
- * Run code for a specific language with given input
- * Returns { stdout, stderr, exitCode, timedOut }
- */
-async function executeCode(language, code, input = '') {
-  const sessionId = uuidv4();
-  const tmpDir = path.join(os.tmpdir(), 'codecamp', sessionId);
-  
-  try {
-    fs.mkdirSync(tmpDir, { recursive: true });
-
-    if (language === 'java') {
-      return await runJava(tmpDir, code, input);
-    } else if (language === 'cpp') {
-      return await runCpp(tmpDir, code, input);
-    } else if (language === 'c') {
-      return await runC(tmpDir, code, input);
-    } else if (language === 'python') {
-      return await runPython(tmpDir, code, input);
-    } else {
-      return { stdout: '', stderr: 'Unsupported language', exitCode: 1, timedOut: false };
-    }
-  } finally {
-    // Cleanup temp directory
-    try {
-      fs.rmSync(tmpDir, { recursive: true, force: true });
-    } catch (e) {
-      // Ignore cleanup errors
-    }
-  }
-}
+// Mapping ngôn ngữ sang compiler Wandbox
+const COMPILER_MAP = {
+  java: 'openjdk-jdk-17.0.1+12',
+  cpp: 'gcc-12.1.0',
+  c: 'gcc-12.1.0-c',
+  python: 'cpython-3.10.2'
+};
 
 /**
- * Compile and run Java code
+ * Gọi Wandbox API để biên dịch và chạy code
  */
-async function runJava(tmpDir, code, input) {
-  // Extract class name from code
-  const classNameMatch = code.match(/public\s+class\s+(\w+)/);
-  const className = classNameMatch ? classNameMatch[1] : 'Main';
-  
-  // If no public class found, wrap in Main class
-  let finalCode = code;
-  if (!classNameMatch) {
-    // Check if it has a class at all
-    if (!code.match(/class\s+\w+/)) {
-      finalCode = `public class Main {\n${code}\n}`;
-    }
-  }
-
-  const sourceFile = path.join(tmpDir, `${className}.java`);
-  fs.writeFileSync(sourceFile, finalCode);
-
-  // Compile
-  try {
-    await execPromise('javac', [sourceFile], tmpDir, TIMEOUT_MS);
-  } catch (compileError) {
-    return {
-      stdout: '',
-      stderr: `Compile Error:\n${compileError.stderr || compileError.message}`,
-      exitCode: 1,
-      timedOut: false,
-      status: 'error'
-    };
-  }
-
-  // Run
-  try {
-    const result = await execPromise('java', ['-cp', tmpDir, className], tmpDir, TIMEOUT_MS, input);
-    return {
-      stdout: result.stdout.trim(),
-      stderr: result.stderr,
-      exitCode: 0,
-      timedOut: false,
-      status: 'success'
-    };
-  } catch (runError) {
-    if (runError.timedOut) {
-      return {
-        stdout: '',
-        stderr: 'Time Limit Exceeded (5s)',
-        exitCode: 1,
-        timedOut: true,
-        status: 'tle'
-      };
-    }
-    return {
-      stdout: runError.stdout || '',
-      stderr: `Runtime Error:\n${runError.stderr || runError.message}`,
-      exitCode: 1,
-      timedOut: false,
-      status: 'error'
-    };
-  }
-}
-
-/**
- * Compile and run C++ code
- */
-async function runCpp(tmpDir, code, input) {
-  const sourceFile = path.join(tmpDir, 'main.cpp');
-  const outputFile = path.join(tmpDir, os.platform() === 'win32' ? 'main.exe' : 'main');
-  
-  fs.writeFileSync(sourceFile, code);
-
-  // Compile
-  try {
-    await execPromise('g++', ['-o', outputFile, sourceFile, '-std=c++17'], tmpDir, TIMEOUT_MS);
-  } catch (compileError) {
-    return {
-      stdout: '',
-      stderr: `Compile Error:\n${compileError.stderr || compileError.message}`,
-      exitCode: 1,
-      timedOut: false,
-      status: 'error'
-    };
-  }
-
-  // Run
-  try {
-    const result = await execPromise(outputFile, [], tmpDir, TIMEOUT_MS, input);
-    return {
-      stdout: result.stdout.trim(),
-      stderr: result.stderr,
-      exitCode: 0,
-      timedOut: false,
-      status: 'success'
-    };
-  } catch (runError) {
-    if (runError.timedOut) {
-      return {
-        stdout: '',
-        stderr: 'Time Limit Exceeded (5s)',
-        exitCode: 1,
-        timedOut: true,
-        status: 'tle'
-      };
-    }
-    return {
-      stdout: runError.stdout || '',
-      stderr: `Runtime Error:\n${runError.stderr || runError.message}`,
-      exitCode: 1,
-      timedOut: false,
-      status: 'error'
-    };
-  }
-}
-
-/**
- * Compile and run C code
- */
-async function runC(tmpDir, code, input) {
-  const sourceFile = path.join(tmpDir, 'main.c');
-  const outputFile = path.join(tmpDir, os.platform() === 'win32' ? 'main.exe' : 'main');
-  
-  fs.writeFileSync(sourceFile, code);
-
-  // Compile
-  try {
-    await execPromise('gcc', ['-o', outputFile, sourceFile], tmpDir, TIMEOUT_MS);
-  } catch (compileError) {
-    return {
-      stdout: '',
-      stderr: `Compile Error:\n${compileError.stderr || compileError.message}`,
-      exitCode: 1,
-      timedOut: false,
-      status: 'error'
-    };
-  }
-
-  // Run
-  try {
-    const result = await execPromise(outputFile, [], tmpDir, TIMEOUT_MS, input);
-    return {
-      stdout: result.stdout.trim(),
-      stderr: result.stderr,
-      exitCode: 0,
-      timedOut: false,
-      status: 'success'
-    };
-  } catch (runError) {
-    if (runError.timedOut) {
-      return { stdout: '', stderr: 'Time Limit Exceeded (5s)', exitCode: 1, timedOut: true, status: 'tle' };
-    }
-    return { stdout: runError.stdout || '', stderr: `Runtime Error:\n${runError.stderr || runError.message}`, exitCode: 1, timedOut: false, status: 'error' };
-  }
-}
-
-/**
- * Run Python 3 code
- */
-async function runPython(tmpDir, code, input) {
-  const sourceFile = path.join(tmpDir, 'main.py');
-  fs.writeFileSync(sourceFile, code);
-
-  // Run
-  try {
-    const pythonCmd = os.platform() === 'win32' ? 'python' : 'python3';
-    const result = await execPromise(pythonCmd, [sourceFile], tmpDir, TIMEOUT_MS, input);
-    return {
-      stdout: result.stdout.trim(),
-      stderr: result.stderr,
-      exitCode: 0,
-      timedOut: false,
-      status: 'success'
-    };
-  } catch (runError) {
-    if (runError.timedOut) {
-      return { stdout: '', stderr: 'Time Limit Exceeded (5s)', exitCode: 1, timedOut: true, status: 'tle' };
-    }
-    return { stdout: runError.stdout || '', stderr: `Runtime Error:\n${runError.stderr || runError.message}`, exitCode: 1, timedOut: false, status: 'error' };
-  }
-}
-
-/**
- * Promise wrapper for execFile with timeout and stdin support
- */
-function execPromise(command, args, cwd, timeout, stdinData = '') {
+function callWandbox(compiler, code, stdin = '') {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
-      cwd,
-      timeout,
-      stdio: ['pipe', 'pipe', 'pipe'],
-      env: { ...process.env }
+    const payload = JSON.stringify({
+      compiler,
+      code,
+      stdin,
+      options: compiler.includes('gcc') && !compiler.includes('-c') ? 'warning,gnu++17' : ''
     });
 
-    let stdout = '';
-    let stderr = '';
-    let timedOut = false;
+    const options = {
+      hostname: 'wandbox.org',
+      path: '/api/compile.json',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload)
+      },
+      timeout: TIMEOUT_MS
+    };
 
-    const timer = setTimeout(() => {
-      timedOut = true;
-      child.kill('SIGKILL');
-    }, timeout);
-
-    child.stdout.on('data', (data) => {
-      stdout += data.toString();
-      if (stdout.length > MAX_OUTPUT_SIZE) {
-        child.kill('SIGKILL');
-      }
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => { data += chunk; });
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          resolve(json);
+        } catch (e) {
+          reject(new Error('Invalid response from compiler API'));
+        }
+      });
     });
 
-    child.stderr.on('data', (data) => {
-      stderr += data.toString();
+    req.on('timeout', () => {
+      req.destroy();
+      reject(new Error('API timeout'));
     });
 
-    child.on('close', (exitCode) => {
-      clearTimeout(timer);
-      if (timedOut) {
-        reject({ stdout, stderr, timedOut: true, message: 'Time Limit Exceeded' });
-      } else if (exitCode !== 0) {
-        reject({ stdout, stderr, exitCode, timedOut: false, message: stderr });
-      } else {
-        resolve({ stdout, stderr, exitCode });
-      }
+    req.on('error', (err) => {
+      reject(err);
     });
 
-    child.on('error', (err) => {
-      clearTimeout(timer);
-      reject({ stdout: '', stderr: err.message, exitCode: 1, timedOut: false, message: err.message });
-    });
-
-    // Write stdin data
-    if (stdinData) {
-      child.stdin.write(stdinData);
-    }
-    child.stdin.end();
+    req.write(payload);
+    req.end();
   });
 }
 
 /**
+ * Run code for a specific language with given input
+ */
+async function executeCode(language, code, input = '') {
+  const compiler = COMPILER_MAP[language];
+  if (!compiler) {
+    return { stdout: '', stderr: 'Unsupported language', exitCode: 1, timedOut: false, status: 'error' };
+  }
+
+  try {
+    const result = await callWandbox(compiler, code, input);
+
+    const stdout = (result.program_output || '').trim();
+    const compileErr = result.compiler_error || '';
+    const runtimeErr = result.program_error || '';
+    const signal = result.signal || '';
+    const status_code = result.status || '0';
+
+    // Kiểm tra lỗi biên dịch
+    if (compileErr && !stdout && status_code !== '0') {
+      return {
+        stdout: '',
+        stderr: `Compile Error:\n${compileErr}`,
+        exitCode: 1,
+        timedOut: false,
+        status: 'error'
+      };
+    }
+
+    // Kiểm tra timeout/signal
+    if (signal === 'Killed' || signal === '9') {
+      return {
+        stdout: '',
+        stderr: 'Time Limit Exceeded',
+        exitCode: 1,
+        timedOut: true,
+        status: 'tle'
+      };
+    }
+
+    // Kiểm tra runtime error
+    if (status_code !== '0' && !stdout) {
+      return {
+        stdout: '',
+        stderr: `Runtime Error:\n${runtimeErr || compileErr || 'Unknown error'}`,
+        exitCode: 1,
+        timedOut: false,
+        status: 'error'
+      };
+    }
+
+    return {
+      stdout,
+      stderr: runtimeErr || compileErr || '',
+      exitCode: parseInt(status_code) || 0,
+      timedOut: false,
+      status: 'success'
+    };
+
+  } catch (err) {
+    return {
+      stdout: '',
+      stderr: `Server Error: ${err.message}`,
+      exitCode: 1,
+      timedOut: err.message === 'API timeout',
+      status: 'error'
+    };
+  }
+}
+
+/**
  * Run code against multiple test cases
- * Returns array of test results
  */
 async function runTestCases(language, code, testCases) {
   const results = [];
-  
+
   for (const testCase of testCases) {
     try {
       const result = await executeCode(language, code, testCase.input);
-      
-      const actualOutput = result.stdout.trim();
-      const expectedOutput = testCase.expectedOutput.trim();
+
+      const actualOutput = (result.stdout || '').trim();
+      const expectedOutput = (testCase.expectedOutput || '').trim();
       const passed = actualOutput === expectedOutput;
 
       results.push({
         input: testCase.input,
-        expectedOutput: expectedOutput,
-        actualOutput: actualOutput,
+        expectedOutput,
+        actualOutput,
         passed,
         error: result.stderr || null,
         status: result.status
       });
 
-      // If compile error or TLE, skip remaining test cases
+      // Nếu lỗi biên dịch hoặc TLE, bỏ qua các test còn lại
       if (result.status === 'error' || result.status === 'tle') {
-        // Fill remaining tests as failed
         for (let i = results.length; i < testCases.length; i++) {
           results.push({
             input: testCases[i].input,
