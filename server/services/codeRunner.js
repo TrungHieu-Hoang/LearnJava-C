@@ -1,31 +1,68 @@
 const https = require('https');
-const http = require('http');
 
 const TIMEOUT_MS = 15000;
 
-// Wandbox compiler mapping
+// ===== REXTESTER API (Primary) =====
+// Rextester language codes
+const REXTESTER_LANGS = { java: 4, c: 6, cpp: 7, python: 24 };
+
+function callRextester(language, code, stdin = '') {
+  return new Promise((resolve, reject) => {
+    const langCode = REXTESTER_LANGS[language];
+    if (!langCode) return reject(new Error('Unsupported language'));
+
+    const postData = `LanguageChoice=${langCode}&Program=${encodeURIComponent(code)}&Input=${encodeURIComponent(stdin)}`;
+
+    const req = https.request({
+      hostname: 'rextester.com',
+      path: '/rundotnet/api',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => { data += chunk; });
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          const stdout = (json.Result || '').replace(/\n$/, '');
+          const stderr = (json.Errors || '').trim();
+          const warnings = (json.Warnings || '').trim();
+
+          if (stderr && !stdout) {
+            resolve({ stdout: '', stderr, exitCode: 1, timedOut: false, status: 'error' });
+          } else {
+            resolve({ stdout, stderr: stderr || warnings, exitCode: 0, timedOut: false, status: 'success' });
+          }
+        } catch (e) {
+          reject(new Error('API parse error: ' + data.substring(0, 100)));
+        }
+      });
+    });
+
+    req.setTimeout(TIMEOUT_MS, () => { req.destroy(); reject(new Error('Timeout')); });
+    req.on('error', reject);
+    req.write(postData);
+    req.end();
+  });
+}
+
+// ===== WANDBOX API (Fallback) =====
 const WANDBOX_COMPILERS = {
-  java: 'openjdk-head',
-  cpp: 'gcc-head',
-  c: 'gcc-head-c',
-  python: 'cpython-head'
+  java: 'openjdk-jdk-17.0.1+12',
+  cpp: 'gcc-12.2.0',
+  c: 'gcc-12.2.0-c',
+  python: 'cpython-3.10.2'
 };
 
-/**
- * Gọi Wandbox API
- */
 function callWandbox(language, code, stdin = '') {
   return new Promise((resolve, reject) => {
     const compiler = WANDBOX_COMPILERS[language];
-    const body = {
-      compiler,
-      code,
-      stdin,
-      options: language === 'cpp' ? 'warning,gnu++17' : ''
-    };
-    const payload = JSON.stringify(body);
+    const payload = JSON.stringify({ compiler, code, stdin });
 
-    const options = {
+    const req = https.request({
       hostname: 'wandbox.org',
       path: '/api/compile.json',
       method: 'POST',
@@ -33,14 +70,13 @@ function callWandbox(language, code, stdin = '') {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(payload)
       }
-    };
-
-    const req = https.request(options, (res) => {
+    }, (res) => {
       let data = '';
       res.on('data', chunk => { data += chunk; });
       res.on('end', () => {
         try {
           const json = JSON.parse(data);
+          if (json.error) return reject(new Error(json.error));
           const stdout = (json.program_output || '').replace(/\n$/, '');
           const stderr = json.compiler_error || json.program_error || '';
           const exitCode = parseInt(json.status || '0');
@@ -54,7 +90,7 @@ function callWandbox(language, code, stdin = '') {
             resolve({ stdout, stderr, exitCode, timedOut: false, status: 'success' });
           }
         } catch (e) {
-          reject(new Error('Wandbox returned invalid response: ' + data.substring(0, 200)));
+          reject(new Error('Wandbox parse error'));
         }
       });
     });
@@ -67,77 +103,34 @@ function callWandbox(language, code, stdin = '') {
 }
 
 /**
- * Fallback: Rextester API (backup nếu Wandbox lỗi)
- */
-function callRextester(language, code, stdin = '') {
-  return new Promise((resolve, reject) => {
-    // Rextester language codes
-    const langMap = { c: 6, cpp: 7, java: 4, python: 24 };
-    const langCode = langMap[language];
-    if (!langCode) return reject(new Error('Unsupported'));
-
-    const postData = `LanguageChoice=${langCode}&Program=${encodeURIComponent(code)}&Input=${encodeURIComponent(stdin)}`;
-
-    const options = {
-      hostname: 'rextester.com',
-      path: '/rundotnet/api',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(postData)
-      }
-    };
-
-    const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', chunk => { data += chunk; });
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(data);
-          const stdout = (json.Result || '').replace(/\n$/, '');
-          const stderr = json.Errors || '';
-          
-          if (stderr && !stdout) {
-            resolve({ stdout: '', stderr, exitCode: 1, timedOut: false, status: 'error' });
-          } else {
-            resolve({ stdout, stderr, exitCode: 0, timedOut: false, status: 'success' });
-          }
-        } catch (e) {
-          reject(new Error('Rextester error'));
-        }
-      });
-    });
-
-    req.setTimeout(TIMEOUT_MS, () => { req.destroy(); reject(new Error('Timeout')); });
-    req.on('error', reject);
-    req.write(postData);
-    req.end();
-  });
-}
-
-/**
- * Chạy code với fallback: Wandbox -> Rextester
+ * Chạy code: Rextester (primary) -> Wandbox (fallback)
  */
 async function executeCode(language, code, input = '') {
-  if (!WANDBOX_COMPILERS[language]) {
+  if (!REXTESTER_LANGS[language]) {
     return { stdout: '', stderr: 'Ngôn ngữ không hỗ trợ', exitCode: 1, timedOut: false, status: 'error' };
   }
 
+  // Thử Rextester trước
   try {
-    return await callWandbox(language, code, input);
-  } catch (wandboxErr) {
-    console.log('Wandbox failed, trying Rextester:', wandboxErr.message);
-    try {
-      return await callRextester(language, code, input);
-    } catch (rexErr) {
-      return {
-        stdout: '',
-        stderr: `Lỗi kết nối compiler. Vui lòng thử lại sau.\n(${wandboxErr.message})`,
-        exitCode: 1,
-        timedOut: false,
-        status: 'error'
-      };
-    }
+    const result = await callRextester(language, code, input);
+    return result;
+  } catch (rexErr) {
+    console.log('Rextester failed:', rexErr.message);
+  }
+
+  // Fallback sang Wandbox
+  try {
+    const result = await callWandbox(language, code, input);
+    return result;
+  } catch (wbErr) {
+    console.log('Wandbox failed:', wbErr.message);
+    return {
+      stdout: '',
+      stderr: 'Lỗi kết nối compiler. Vui lòng thử lại sau.',
+      exitCode: 1,
+      timedOut: false,
+      status: 'error'
+    };
   }
 }
 
@@ -152,13 +145,12 @@ async function runTestCases(language, code, testCases) {
       const result = await executeCode(language, code, testCase.input);
       const actualOutput = (result.stdout || '').trim();
       const expectedOutput = (testCase.expectedOutput || '').trim();
-      const passed = actualOutput === expectedOutput;
 
       results.push({
         input: testCase.input,
         expectedOutput,
         actualOutput,
-        passed,
+        passed: actualOutput === expectedOutput,
         error: result.stderr || null,
         status: result.status
       });
