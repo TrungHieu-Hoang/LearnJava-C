@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "seed": "node seed.js"
+    "seed": "node seed.js",
+    "build": "chmod +x install-compilers.sh && ./install-compilers.sh"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

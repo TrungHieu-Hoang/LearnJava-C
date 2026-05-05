@@ -154,6 +154,82 @@ for (int num : numbers) {
     System.out.print(num + " ");
 }</code></pre>
       `
+    },
+    {
+      id: 'java-functions',
+      title: '7. Hàm (Methods)',
+      content: `
+        <h1>Phương thức (Methods)</h1>
+        <p>Hàm giúp chia nhỏ chương trình thành các khối logic tái sử dụng. Trong Java, hàm nằm trong class và gọi là <strong>Method</strong>.</p>
+        <pre><code>static int tinhTong(int a, int b) {
+    return a + b;
+}
+
+public static void main(String[] args) {
+    int kq = tinhTong(3, 5);
+    System.out.println(kq); // 8
+}</code></pre>
+        <h3>Hàm void (không trả về)</h3>
+        <pre><code>static void chao(String name) {
+    System.out.println("Xin chao " + name);
+}</code></pre>
+      `
+    },
+    {
+      id: 'java-string',
+      title: '8. Xử lý chuỗi (String)',
+      content: `
+        <h1>Chuỗi ký tự (String)</h1>
+        <p>String trong Java là <strong>Object bất biến (Immutable)</strong>.</p>
+        <pre><code>String s = "Hello CodeCamp";
+s.length();           // 14
+s.charAt(0);          // 'H'
+s.substring(6);       // "CodeCamp"
+s.toUpperCase();      // "HELLO CODECAMP"
+s.contains("Code");   // true
+s.indexOf("Camp");    // 10
+s.replace("Hello","Hi"); // "Hi CodeCamp"
+s.split(" ");         // ["Hello","CodeCamp"]</code></pre>
+        <div class="tut-note">
+          <strong>So sánh chuỗi:</strong> KHÔNG dùng <code>==</code>. Dùng <code>s1.equals(s2)</code>.
+        </div>
+      `
+    },
+    {
+      id: 'java-switch',
+      title: '9. Switch-Case',
+      content: `
+        <h1>Switch-Case</h1>
+        <p>Thay thế chuỗi if-else dài khi so sánh một biến với nhiều giá trị cụ thể.</p>
+        <pre><code>int day = 3;
+switch (day) {
+    case 1: System.out.println("Thu Hai"); break;
+    case 2: System.out.println("Thu Ba"); break;
+    case 3: System.out.println("Thu Tu"); break;
+    default: System.out.println("Ngay khac"); break;
+}</code></pre>
+        <div class="tut-note"><strong>Quan trọng:</strong> Quên <code>break</code> sẽ gây lỗi fall-through (chạy tiếp case dưới).</div>
+      `
+    },
+    {
+      id: 'java-arraylist',
+      title: '10. ArrayList',
+      content: `
+        <h1>ArrayList - Mảng tự co giãn</h1>
+        <p>Khác mảng thường có kích thước cố định, <code>ArrayList</code> thêm/xóa tự do.</p>
+        <pre><code>import java.util.ArrayList;
+
+ArrayList&lt;String&gt; ds = new ArrayList&lt;&gt;();
+ds.add("An");
+ds.add("Binh");
+ds.get(0);        // "An"
+ds.size();        // 2
+ds.remove(0);     // Xóa "An"
+
+for (String ten : ds) {
+    System.out.println(ten);
+}</code></pre>
+      `
     }
   ],
   cpp: [
@@ -289,6 +365,81 @@ int main() {
     return 0;
 }</code></pre>
       `
+    },
+    {
+      id: 'cpp-functions',
+      title: '6. Hàm (Functions)',
+      content: `
+        <h1>Hàm trong C++</h1>
+        <pre><code>int tinhTong(int a, int b) {
+    return a + b;
+}
+
+void inChao(string name) {
+    cout &lt;&lt; "Chao " &lt;&lt; name &lt;&lt; endl;
+}
+
+int main() {
+    cout &lt;&lt; tinhTong(3, 5); // 8
+    inChao("CodeCamp");
+    return 0;
+}</code></pre>
+        <h3>Truyền tham chiếu (&amp;)</h3>
+        <p>Cho phép hàm thay đổi trực tiếp giá trị biến gốc bên ngoài.</p>
+        <pre><code>void doiCho(int &a, int &b) {
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+int x = 1, y = 2;
+doiCho(x, y);
+cout &lt;&lt; x &lt;&lt; " " &lt;&lt; y; // 2 1</code></pre>
+      `
+    },
+    {
+      id: 'cpp-string',
+      title: '7. Chuỗi (String)',
+      content: `
+        <h1>Xử lý chuỗi trong C++</h1>
+        <pre><code>#include &lt;string&gt;
+
+string s = "Hello World";
+s.length();        // 11
+s.substr(6);       // "World"
+s.find("World");   // 6
+s += " C++";       // Nối chuỗi: "Hello World C++"
+
+// Nhập cả dòng (có dấu cách)
+string line;
+getline(cin, line);</code></pre>
+      `
+    },
+    {
+      id: 'cpp-sort',
+      title: '8. Sắp xếp &amp; Algorithm',
+      content: `
+        <h1>Thư viện Algorithm</h1>
+        <p>C++ có hàm <code>sort()</code> cực nhanh, sắp xếp mảng/vector chỉ bằng 1 dòng.</p>
+        <pre><code>#include &lt;algorithm&gt;
+#include &lt;vector&gt;
+
+vector&lt;int&gt; v = {5, 2, 8, 1, 9};
+
+// Sắp xếp tăng dần
+sort(v.begin(), v.end());
+// v = {1, 2, 5, 8, 9}
+
+// Sắp xếp giảm dần
+sort(v.begin(), v.end(), greater&lt;int&gt;());
+
+// Đảo ngược
+reverse(v.begin(), v.end());
+
+// Tìm min/max
+int mn = *min_element(v.begin(), v.end());
+int mx = *max_element(v.begin(), v.end());</code></pre>
+      `
     }
   ],
   c: [
@@ -379,6 +530,50 @@ int *ptr = &x; // ptr trỏ tới địa chỉ của biến x
 printf("Gia tri cua x: %d\\n", x);         // 10
 printf("Dia chi cua x: %p\\n", &x);        // VD: 0x7ffe42
 printf("Gia tri qua con tro: %d\\n", *ptr); // 10 (Toán tử * để giải tham chiếu)</code></pre>
+      `
+    },
+    {
+      id: 'c-functions',
+      title: '5. Hàm (Functions)',
+      content: `
+        <h1>Hàm trong C</h1>
+        <p>Hàm phải được <strong>khai báo trước</strong> khi gọi, hoặc đặt phía trên hàm <code>main()</code>.</p>
+        <pre><code>int tinhTong(int a, int b) {
+    return a + b;
+}
+
+void inKetQua(int n) {
+    printf("Ket qua: %d\\n", n);
+}
+
+int main() {
+    int s = tinhTong(3, 5);
+    inKetQua(s); // Ket qua: 8
+    return 0;
+}</code></pre>
+      `
+    },
+    {
+      id: 'c-struct',
+      title: '6. Struct (Kiểu cấu trúc)',
+      content: `
+        <h1>Struct - Tự tạo kiểu dữ liệu</h1>
+        <p>C không có class như Java/C++. Thay vào đó dùng <code>struct</code> để gom nhóm nhiều biến lại.</p>
+        <pre><code>struct SinhVien {
+    char ten[50];
+    int tuoi;
+    float diem;
+};
+
+int main() {
+    struct SinhVien sv;
+    strcpy(sv.ten, "Nguyen Van A");
+    sv.tuoi = 20;
+    sv.diem = 8.5;
+
+    printf("%s, %d tuoi, diem %.1f\\n", sv.ten, sv.tuoi, sv.diem);
+    return 0;
+}</code></pre>
       `
     }
   ],
@@ -496,6 +691,91 @@ print(arr[::-1]) # Đảo ngược danh sách trong 1 nốt nhạc!
 # Duyệt list
 for item in arr:
     print(item)</code></pre>
+      `
+    },
+    {
+      id: 'py-functions',
+      title: '7. Hàm (def)',
+      content: `
+        <h1>Hàm trong Python</h1>
+        <p>Dùng từ khóa <code>def</code>. Không cần khai báo kiểu trả về.</p>
+        <pre><code>def tinh_tong(a, b):
+    return a + b
+
+def chao(name):
+    print(f"Xin chao {name}!")
+
+# Gọi hàm
+kq = tinh_tong(3, 5)
+print(kq) # 8
+chao("CodeCamp")</code></pre>
+        <h3>Tham số mặc định</h3>
+        <pre><code>def luy_thua(x, n=2):  # n mặc định = 2
+    return x ** n
+
+print(luy_thua(5))     # 25 (5^2)
+print(luy_thua(2, 10)) # 1024 (2^10)</code></pre>
+      `
+    },
+    {
+      id: 'py-dict',
+      title: '8. Dictionary (Từ điển)',
+      content: `
+        <h1>Dictionary - Cặp Key:Value</h1>
+        <p>Giống HashMap trong Java, lưu dữ liệu theo cặp khóa-giá trị.</p>
+        <pre><code>sv = {
+    "ten": "Nguyen Van A",
+    "tuoi": 20,
+    "diem": 8.5
+}
+
+print(sv["ten"])       # Nguyen Van A
+sv["lop"] = "12A1"     # Thêm key mới
+del sv["tuoi"]         # Xóa key
+
+# Duyệt dictionary
+for key, value in sv.items():
+    print(f"{key}: {value}")</code></pre>
+      `
+    },
+    {
+      id: 'py-string',
+      title: '9. Xử lý chuỗi',
+      content: `
+        <h1>Chuỗi (String) trong Python</h1>
+        <pre><code>s = "Hello CodeCamp"
+
+len(s)              # 14
+s.upper()           # "HELLO CODECAMP"
+s.lower()           # "hello codecamp"
+s.split(" ")        # ["Hello", "CodeCamp"]
+s.replace("Hello", "Hi") # "Hi CodeCamp"
+s.startswith("He")  # True
+s.count("o")        # 2
+" ".join(["A","B"]) # "A B"
+
+# Cắt chuỗi (Slicing)
+s[0:5]   # "Hello"
+s[-8:]   # "CodeCamp"
+s[::-1]  # Đảo ngược chuỗi</code></pre>
+      `
+    },
+    {
+      id: 'py-exception',
+      title: '10. Xử lý lỗi (Try/Except)',
+      content: `
+        <h1>Bắt lỗi với Try/Except</h1>
+        <p>Giúp chương trình không bị dừng đột ngột khi gặp lỗi.</p>
+        <pre><code>try:
+    n = int(input("Nhap so: "))
+    kq = 100 / n
+    print(f"Ket qua: {kq}")
+except ValueError:
+    print("Ban nhap khong phai so!")
+except ZeroDivisionError:
+    print("Khong the chia cho 0!")
+finally:
+    print("Luon chay du co loi hay khong")</code></pre>
       `
     }
   ]
