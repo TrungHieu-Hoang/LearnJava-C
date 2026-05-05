@@ -15,7 +15,9 @@ const javaTopics = [
   { language: 'java', order: 5, title: 'Mảng 1D/2D', theoryHTML: '<h3>Mảng (Array)</h3><p>Lưu trữ nhiều giá trị cùng lúc...</p>', defaultCode: '' },
   { language: 'java', order: 6, title: 'Hàm & Đệ quy', theoryHTML: '<h3>Hàm (Method)</h3><p>Tái sử dụng các khối mã...</p>', defaultCode: '' },
   { language: 'java', order: 7, title: 'OOP cơ bản', theoryHTML: '<h3>Hướng đối tượng</h3><p>Class, Object, Inheritance, Polymorphism...</p>', defaultCode: '' },
-  { language: 'java', order: 8, title: 'Collections & Generics', theoryHTML: '<h3>List, Set, Map</h3><p>Sử dụng thư viện java.util...</p>', defaultCode: '' }
+  { language: 'java', order: 8, title: 'Collections & Generics', theoryHTML: '<h3>List, Set, Map</h3><p>Sử dụng thư viện java.util...</p>', defaultCode: '' },
+  { language: 'java', order: 9, title: 'Xử lý ngoại lệ', theoryHTML: '<h3>Try/Catch</h3><p>Bắt lỗi và xử lý ngoại lệ an toàn...</p>', defaultCode: '' },
+  { language: 'java', order: 10, title: 'File I/O', theoryHTML: '<h3>Đọc/Ghi File</h3><p>Làm việc với File trong Java...</p>', defaultCode: '' }
 ];
 
 const cppTopics = [
@@ -26,7 +28,9 @@ const cppTopics = [
   { language: 'cpp', order: 5, title: 'Hàm & Con trỏ', theoryHTML: '<h3>Functions & Pointers</h3><p>Con trỏ là khái niệm đặc biệt trong C/C++...</p>', defaultCode: '' },
   { language: 'cpp', order: 6, title: 'Reference & Vector', theoryHTML: '<h3>Tham chiếu và Vector</h3><p>Sử dụng mảng động std::vector...</p>', defaultCode: '' },
   { language: 'cpp', order: 7, title: 'Class & OOP', theoryHTML: '<h3>Lớp và Đối tượng</h3><p>Tính đóng gói, kế thừa...</p>', defaultCode: '' },
-  { language: 'cpp', order: 8, title: 'Algorithms & Sort', theoryHTML: '<h3>Thuật toán</h3><p>Thư viện std::sort, binary_search...</p>', defaultCode: '' }
+  { language: 'cpp', order: 8, title: 'Algorithms & Sort', theoryHTML: '<h3>Thuật toán</h3><p>Thư viện std::sort, binary_search...</p>', defaultCode: '' },
+  { language: 'cpp', order: 9, title: 'Xử lý ngoại lệ', theoryHTML: '<h3>Try/Catch</h3><p>Xử lý lỗi runtime trong C++...</p>', defaultCode: '' },
+  { language: 'cpp', order: 10, title: 'File I/O', theoryHTML: '<h3>Đọc/Ghi File fstream</h3><p>Thao tác với tệp tin trong C++...</p>', defaultCode: '' }
 ];
 
 const cTopics = [
@@ -34,7 +38,12 @@ const cTopics = [
   { language: 'c', order: 2, title: 'Biến & Kiểu dữ liệu', theoryHTML: '<h3>Biến trong C</h3><p>int, float, double, char...</p>', defaultCode: '' },
   { language: 'c', order: 3, title: 'Điều kiện', theoryHTML: '<h3>if/else, switch</h3><p>Rẽ nhánh chương trình...</p>', defaultCode: '' },
   { language: 'c', order: 4, title: 'Vòng lặp', theoryHTML: '<h3>for, while, do-while</h3><p>Lặp lại khối lệnh...</p>', defaultCode: '' },
-  { language: 'c', order: 5, title: 'Hàm & Con trỏ', theoryHTML: '<h3>Hàm & Con trỏ (Pointers)</h3><p>Con trỏ là khái niệm linh hồn của C...</p>', defaultCode: '' }
+  { language: 'c', order: 5, title: 'Hàm & Con trỏ', theoryHTML: '<h3>Hàm & Con trỏ (Pointers)</h3><p>Con trỏ là khái niệm linh hồn của C...</p>', defaultCode: '' },
+  { language: 'c', order: 6, title: 'Struct (Cấu trúc)', theoryHTML: '<h3>Kiểu dữ liệu tự định nghĩa</h3><p>Gộp các biến lại với nhau...</p>', defaultCode: '' },
+  { language: 'c', order: 7, title: 'Chuỗi (String)', theoryHTML: '<h3>Mảng ký tự</h3><p>Hàm strlen, strcpy, strcmp...</p>', defaultCode: '' },
+  { language: 'c', order: 8, title: 'Cấp phát động', theoryHTML: '<h3>malloc, calloc, free</h3><p>Quản lý bộ nhớ thủ công...</p>', defaultCode: '' },
+  { language: 'c', order: 9, title: 'File I/O', theoryHTML: '<h3>Đọc/Ghi File</h3><p>Sử dụng fopen, fclose...</p>', defaultCode: '' },
+  { language: 'c', order: 10, title: 'Macro & Tiền xử lý', theoryHTML: '<h3>#define, #include</h3><p>Chỉ thị tiền biên dịch...</p>', defaultCode: '' }
 ];
 
 const pythonTopics = [
@@ -42,7 +51,12 @@ const pythonTopics = [
   { language: 'python', order: 2, title: 'Biến & Kiểu dữ liệu', theoryHTML: '<h3>Biến trong Python</h3><p>int, float, str, bool...</p>', defaultCode: '' },
   { language: 'python', order: 3, title: 'Điều kiện', theoryHTML: '<h3>if/elif/else</h3><p>Rẽ nhánh chương trình...</p>', defaultCode: '' },
   { language: 'python', order: 4, title: 'Vòng lặp', theoryHTML: '<h3>for, while</h3><p>Lặp lại khối lệnh...</p>', defaultCode: '' },
-  { language: 'python', order: 5, title: 'Cấu trúc dữ liệu', theoryHTML: '<h3>List, Tuple, Set, Dict</h3><p>Lưu trữ và xử lý dữ liệu linh hoạt...</p>', defaultCode: '' }
+  { language: 'python', order: 5, title: 'List & Tuple', theoryHTML: '<h3>Cấu trúc dữ liệu cơ bản</h3><p>Danh sách linh hoạt...</p>', defaultCode: '' },
+  { language: 'python', order: 6, title: 'Set & Dictionary', theoryHTML: '<h3>Từ điển và Tập hợp</h3><p>Tra cứu dữ liệu siêu nhanh...</p>', defaultCode: '' },
+  { language: 'python', order: 7, title: 'Hàm (Functions)', theoryHTML: '<h3>def & lambda</h3><p>Tạo và sử dụng hàm...</p>', defaultCode: '' },
+  { language: 'python', order: 8, title: 'Xử lý chuỗi', theoryHTML: '<h3>String Methods</h3><p>Cắt chuỗi, tìm kiếm, format...</p>', defaultCode: '' },
+  { language: 'python', order: 9, title: 'Class & OOP', theoryHTML: '<h3>Lập trình hướng đối tượng</h3><p>Xây dựng lớp và đối tượng...</p>', defaultCode: '' },
+  { language: 'python', order: 10, title: 'File I/O & Exceptions', theoryHTML: '<h3>Đọc ghi file & Bắt lỗi</h3><p>with open và try/except...</p>', defaultCode: '' }
 ];
 
 const exercises = [

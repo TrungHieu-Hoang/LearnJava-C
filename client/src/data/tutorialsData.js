@@ -440,6 +440,56 @@ reverse(v.begin(), v.end());
 int mn = *min_element(v.begin(), v.end());
 int mx = *max_element(v.begin(), v.end());</code></pre>
       `
+    },
+    {
+      id: 'cpp-exceptions',
+      title: '9. Xử lý ngoại lệ',
+      content: `
+        <h1>Try/Catch trong C++</h1>
+        <p>Bắt và xử lý các lỗi phát sinh trong lúc chương trình đang chạy để tránh việc chương trình bị văng (crash).</p>
+        <pre><code>#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    try {
+        int a = 10;
+        int b = 0;
+        if (b == 0) throw "Lỗi chia cho 0!";
+        cout << a / b << endl;
+    } catch (const char* msg) {
+        cout << "Ngoại lệ: " << msg << endl;
+    }
+    return 0;
+}</code></pre>
+      `
+    },
+    {
+      id: 'cpp-fileio',
+      title: '10. File I/O',
+      content: `
+        <h1>Đọc và Ghi File với fstream</h1>
+        <p>Thư viện <code>&lt;fstream&gt;</code> cung cấp <code>ofstream</code> để ghi và <code>ifstream</code> để đọc file.</p>
+        <pre><code>#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+int main() {
+    // Ghi file
+    ofstream outFile("data.txt");
+    outFile << "Hello CodeCamp!" << endl;
+    outFile.close();
+
+    // Đọc file
+    ifstream inFile("data.txt");
+    string line;
+    while (getline(inFile, line)) {
+        cout << line << endl;
+    }
+    inFile.close();
+    return 0;
+}</code></pre>
+      `
     }
   ],
   c: [
@@ -572,6 +622,88 @@ int main() {
     sv.diem = 8.5;
 
     printf("%s, %d tuoi, diem %.1f\\n", sv.ten, sv.tuoi, sv.diem);
+    return 0;
+}</code></pre>
+      `
+    },
+    {
+      id: 'c-string',
+      title: '7. Chuỗi (String)',
+      content: `
+        <h1>Xử lý chuỗi trong C</h1>
+        <p>Chuỗi trong C thực chất là một mảng ký tự kết thúc bằng ký tự null <code>'\\0'</code>. Thư viện <code>&lt;string.h&gt;</code> chứa các hàm xử lý.</p>
+        <pre><code>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int main() {
+    char s1[50] = "Hello";
+    char s2[] = " World";
+    
+    strcat(s1, s2); // Nối s2 vào s1
+    printf("Chuoi: %s\\n", s1);
+    printf("Do dai: %zu\\n", strlen(s1));
+    return 0;
+}</code></pre>
+      `
+    },
+    {
+      id: 'c-malloc',
+      title: '8. Cấp phát động',
+      content: `
+        <h1>Quản lý bộ nhớ với malloc, free</h1>
+        <p>Cấp phát vùng nhớ linh hoạt trong thời gian chạy bằng các hàm trong thư viện <code>&lt;stdlib.h&gt;</code>.</p>
+        <pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+
+int main() {
+    int n = 5;
+    // Cấp phát bộ nhớ cho mảng 5 số nguyên
+    int *arr = (int*) malloc(n * sizeof(int));
+    
+    for (int i = 0; i < n; i++) arr[i] = i + 1;
+    
+    free(arr); // Quan trọng: Giải phóng bộ nhớ
+    return 0;
+}</code></pre>
+      `
+    },
+    {
+      id: 'c-fileio',
+      title: '9. File I/O',
+      content: `
+        <h1>Đọc / Ghi tệp tin trong C</h1>
+        <p>Sử dụng con trỏ <code>FILE*</code> cùng các hàm như <code>fopen</code>, <code>fprintf</code>, <code>fscanf</code>.</p>
+        <pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    // Ghi vào file
+    FILE *f = fopen("test.txt", "w");
+    fprintf(f, "CodeCamp C-Tutorial\\n");
+    fclose(f);
+
+    // Đọc từ file
+    char buffer[100];
+    f = fopen("test.txt", "r");
+    fgets(buffer, 100, f);
+    printf("Doc duoc: %s", buffer);
+    fclose(f);
+    return 0;
+}</code></pre>
+      `
+    },
+    {
+      id: 'c-macro',
+      title: '10. Macro & Tiền xử lý',
+      content: `
+        <h1>Chỉ thị tiền biên dịch (Preprocessor)</h1>
+        <p>Các lệnh bắt đầu bằng <code>#</code> như <code>#include</code> hay <code>#define</code> được xử lý trước khi biên dịch code.</p>
+        <pre><code>#include &lt;stdio.h&gt;
+#define PI 3.14159
+#define SQUARE(x) ((x) * (x))
+
+int main() {
+    float r = 5.0;
+    printf("Dien tich: %.2f\\n", PI * SQUARE(r));
     return 0;
 }</code></pre>
       `
