@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import TheoryPanel from '../components/TheoryPanel';
@@ -17,6 +18,7 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [ideWidth, setIdeWidth] = useState(600); // Chiều rộng mặc định của IDE
   const [isResizing, setIsResizing] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // Xử lý kéo thả để resize IDE
   useEffect(() => {
@@ -122,20 +124,30 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <Navbar />
       
-      <div className="dashboard-layout">
+      <div className={`dashboard-layout ${!isSidebarOpen ? 'sidebar-closed' : ''}`}>
         {/* Left Column: Sidebar */}
-        <div className="col-sidebar">
-          <Sidebar 
-            language={language} 
-            setLanguage={setLanguage}
-            topics={topics}
-            activeTopic={activeTopic}
-            setActiveTopic={handleTopicSelect}
-          />
-        </div>
+        {isSidebarOpen && (
+          <div className="col-sidebar">
+            <Sidebar 
+              language={language} 
+              setLanguage={setLanguage}
+              topics={topics}
+              activeTopic={activeTopic}
+              setActiveTopic={handleTopicSelect}
+            />
+          </div>
+        )}
 
         {/* Middle Column: Theory / Exercises */}
         <div className="col-content">
+          <button 
+            className={`sidebar-toggle-btn ${!isSidebarOpen ? 'closed' : ''}`}
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            title={isSidebarOpen ? "Ẩn Lộ trình học" : "Hiện Lộ trình học"}
+          >
+            {isSidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
+          </button>
+
           {activeExercise ? (
             <ExerciseDetail 
               exercise={activeExercise} 

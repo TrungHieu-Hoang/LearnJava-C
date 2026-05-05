@@ -135,4 +135,39 @@
   .exercise-card {
     padding: 1rem;
   }
+  .sidebar-toggle-btn {
+    display: none; /* Tránh xung đột trên mobile */
+  }
 }
+
+.sidebar-toggle-btn {
+  position: absolute;
+  top: 1.5rem;
+  left: -20px;
+  z-index: 100;
+  background: var(--surface-light);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.sidebar-toggle-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.sidebar-toggle-btn.closed {
+  left: -16px;
+  border-radius: 0 8px 8px 0;
+  border-left: none;
+}
+
