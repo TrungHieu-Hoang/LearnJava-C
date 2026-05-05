@@ -5,20 +5,19 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api';
 import './IDEPanel.css';
 
-const IDEPanel = ({ exercise, defaultCode, language }) => {
+const IDEPanel = ({ exercise, defaultCode, language, onSubmissionComplete }) => {
   const { setUser } = useAuth();
   const [code, setCode] = useState(defaultCode || '');
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [testResults, setTestResults] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState(null);
   const [customInput, setCustomInput] = useState('');
 
   useEffect(() => {
     setCode(defaultCode || '');
     setOutput('');
-    setTestResults(null);
     setStatus(null);
     setCustomInput('');
   }, [exercise, defaultCode, language]);
@@ -27,7 +26,6 @@ const IDEPanel = ({ exercise, defaultCode, language }) => {
     if (!code.trim()) return;
     setIsRunning(true);
     setOutput('Đang biên dịch và chạy code...');
-    setTestResults(null);
     setStatus(null);
     
     try {
@@ -60,7 +58,6 @@ const IDEPanel = ({ exercise, defaultCode, language }) => {
     if (!code.trim() || !exercise) return;
     setIsSubmitting(true);
     setOutput('Đang nộp bài và chấm điểm...');
-    setTestResults(null);
     
     try {
       const res = await api.post('/submissions/submit', { 
@@ -71,7 +68,10 @@ const IDEPanel = ({ exercise, defaultCode, language }) => {
       
       const sub = res.data.submission;
       setStatus(sub.status);
-      setTestResults(sub.testResults);
+      
+      if (onSubmissionComplete) {
+        onSubmissionComplete(sub);
+      }
       
       if (sub.status === 'accepted') {
         setOutput(`🎉 Chúc mừng! Bạn đã giải thành công.\n+${sub.points} điểm.`);
@@ -154,27 +154,6 @@ const IDEPanel = ({ exercise, defaultCode, language }) => {
         <div className="console-header">Console Output</div>
         <div className={`console-content ${status}`}>
           <pre>{output}</pre>
-          
-          {testResults && (
-            <div className="test-results">
-              <h4>Chi tiết Test Cases:</h4>
-              {testResults.map((tr, idx) => (
-                <div key={idx} className={`test-case-card ${tr.passed ? 'passed' : 'failed'}`}>
-                  <div className="test-case-header">
-                    Test Case {idx + 1}: {tr.passed ? '✅ Pass' : '❌ Fail'}
-                  </div>
-                  {!tr.passed && (
-                    <div className="test-case-details">
-                      <div><strong>Input:</strong> <pre>{tr.input}</pre></div>
-                      <div><strong>Expected:</strong> <pre>{tr.expectedOutput}</pre></div>
-                      <div><strong>Actual:</strong> <pre>{tr.actualOutput || (tr.error ? 'Error' : '')}</pre></div>
-                      {tr.error && <div className="test-error"><pre>{tr.error}</pre></div>}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </div>

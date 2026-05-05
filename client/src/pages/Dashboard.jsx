@@ -5,6 +5,7 @@ import Sidebar from '../components/Sidebar';
 import TheoryPanel from '../components/TheoryPanel';
 import ExerciseList from '../components/ExerciseList';
 import ExerciseDetail from '../components/ExerciseDetail';
+import SubmissionResult from '../components/SubmissionResult';
 import IDEPanel from '../components/IDEPanel';
 import api from '../api';
 import './Dashboard.css';
@@ -15,6 +16,7 @@ const Dashboard = () => {
   const [exercises, setExercises] = useState([]);
   const [activeTopic, setActiveTopic] = useState(null);
   const [activeExercise, setActiveExercise] = useState(null);
+  const [submissionResult, setSubmissionResult] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [ideWidth, setIdeWidth] = useState(600); // Chiều rộng mặc định của IDE
   const [isResizing, setIsResizing] = useState(false);
@@ -97,6 +99,7 @@ const Dashboard = () => {
       const res = await api.get(`/topics/${topicId}`);
       setActiveTopic(res.data.topic);
       setActiveExercise(null); // Back to theory when changing topic
+      setSubmissionResult(null);
     } catch (err) {
       console.error('Error fetching topic detail:', err);
     }
@@ -111,6 +114,7 @@ const Dashboard = () => {
       // Fetch full exercise details including test cases
       const res = await api.get(`/exercises/${exercise._id}`);
       setActiveExercise(res.data.exercise);
+      setSubmissionResult(null);
     } catch (err) {
       console.error('Error fetching exercise detail:', err);
     }
@@ -118,6 +122,11 @@ const Dashboard = () => {
 
   const handleBackToExercises = () => {
     setActiveExercise(null);
+    setSubmissionResult(null);
+  };
+
+  const handleSubmissionComplete = (result) => {
+    setSubmissionResult(result);
   };
 
   return (
@@ -148,7 +157,12 @@ const Dashboard = () => {
             {isSidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
           </button>
 
-          {activeExercise ? (
+          {submissionResult ? (
+            <SubmissionResult 
+              submission={submissionResult} 
+              onBack={() => setSubmissionResult(null)} 
+            />
+          ) : activeExercise ? (
             <ExerciseDetail 
               exercise={activeExercise} 
               onBack={handleBackToExercises} 
@@ -184,6 +198,7 @@ const Dashboard = () => {
             exercise={activeExercise} 
             defaultCode={activeExercise ? activeExercise.starterCode : activeTopic?.defaultCode}
             language={language}
+            onSubmissionComplete={handleSubmissionComplete}
           />
         </div>
       </div>

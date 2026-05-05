@@ -35,7 +35,7 @@ const ExerciseDetail = ({ exercise, onBack }) => {
 
         <div className="test-cases-preview">
           <h3>Test Cases Mẫu</h3>
-          {exercise.testCases && exercise.testCases.map((tc, idx) => (
+          {exercise.testCases && exercise.testCases.slice(0, 2).map((tc, idx) => (
             <div key={idx} className="tc-preview-card">
               <div className="tc-label">Test Case {idx + 1}</div>
               <div className="tc-data">
