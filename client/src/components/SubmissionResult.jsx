@@ -19,9 +19,6 @@ const SubmissionResult = ({ submission, onBack, exercise }) => {
   return (
     <div className="submission-result glass-panel">
       <div className="sr-header">
-        <button className="btn-back" onClick={onBack}>
-          <ArrowLeft size={16} /> Quay lại
-        </button>
         <div className="sr-title">
           <h2>Submission of {exercise ? exercise.title : 'Bài tập'}</h2>
         </div>

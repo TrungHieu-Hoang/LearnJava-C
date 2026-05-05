@@ -171,3 +171,53 @@
   border-left: none;
 }
 
+/* Tabs cho khu vực làm bài tập */
+.exercise-workspace {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.workspace-tabs {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 1rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.workspace-tab {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.workspace-tab:hover:not(:disabled) {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.workspace-tab.active {
+  color: var(--primary-light);
+  border-bottom: 2px solid var(--primary);
+}
+
+.workspace-tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.workspace-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+

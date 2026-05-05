@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [activeTopic, setActiveTopic] = useState(null);
   const [activeExercise, setActiveExercise] = useState(null);
   const [submissionResult, setSubmissionResult] = useState(null);
+  const [exerciseTab, setExerciseTab] = useState('description');
   const [isLoading, setIsLoading] = useState(true);
   const [ideWidth, setIdeWidth] = useState(600); // Chiều rộng mặc định của IDE
   const [isResizing, setIsResizing] = useState(false);
@@ -120,6 +121,7 @@ const Dashboard = () => {
       if (exerciseIdToRestore) {
         const exRes = await api.get(`/exercises/${exerciseIdToRestore}`);
         setActiveExercise(exRes.data.exercise);
+        setExerciseTab('description');
       } else {
         setActiveExercise(null);
       }
@@ -139,6 +141,7 @@ const Dashboard = () => {
       const res = await api.get(`/exercises/${exercise._id}`);
       setActiveExercise(res.data.exercise);
       setSubmissionResult(null);
+      setExerciseTab('description');
     } catch (err) {
       console.error('Error fetching exercise detail:', err);
     }
@@ -151,6 +154,7 @@ const Dashboard = () => {
 
   const handleSubmissionComplete = (result) => {
     setSubmissionResult(result);
+    setExerciseTab('result'); // Tự động chuyển sang tab kết quả
     // Refresh exercises to update AC rate and stats
     if (activeTopic) {
       fetchExercises();
@@ -185,17 +189,40 @@ const Dashboard = () => {
             {isSidebarOpen ? <PanelLeftClose size={18} /> : <PanelLeftOpen size={18} />}
           </button>
 
-          {submissionResult ? (
-            <SubmissionResult 
-              submission={submissionResult} 
-              exercise={activeExercise}
-              onBack={() => setSubmissionResult(null)} 
-            />
-          ) : activeExercise ? (
-            <ExerciseDetail 
-              exercise={activeExercise} 
-              onBack={handleBackToExercises} 
-            />
+          {activeExercise ? (
+            <div className="exercise-workspace">
+              <div className="workspace-tabs">
+                <button 
+                  className={`workspace-tab ${exerciseTab === 'description' ? 'active' : ''}`}
+                  onClick={() => setExerciseTab('description')}
+                >
+                  📝 Đề bài
+                </button>
+                <button 
+                  className={`workspace-tab ${exerciseTab === 'result' ? 'active' : ''}`}
+                  onClick={() => setExerciseTab('result')}
+                  disabled={!submissionResult}
+                >
+                  ✅ Kết quả nộp
+                </button>
+              </div>
+              
+              <div className="workspace-content">
+                {exerciseTab === 'description' && (
+                  <ExerciseDetail 
+                    exercise={activeExercise} 
+                    onBack={handleBackToExercises} 
+                  />
+                )}
+                {exerciseTab === 'result' && submissionResult && (
+                  <SubmissionResult 
+                    submission={submissionResult} 
+                    exercise={activeExercise}
+                    onBack={() => setExerciseTab('description')} 
+                  />
+                )}
+              </div>
+            </div>
           ) : activeTopic ? (
             <div className="theory-exercise-split">
               <TheoryPanel topic={activeTopic} />
