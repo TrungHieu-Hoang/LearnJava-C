@@ -11,7 +11,7 @@ import api from '../api';
 import './Dashboard.css';
 
 const Dashboard = () => {
-  const [language, setLanguage] = useState('java');
+  const [language, setLanguage] = useState(() => localStorage.getItem('cc_lang') || 'java');
   const [topics, setTopics] = useState([]);
   const [exercises, setExercises] = useState([]);
   const [activeTopic, setActiveTopic] = useState(null);
@@ -57,11 +57,18 @@ const Dashboard = () => {
 
   // Fetch topics
   useEffect(() => {
+    localStorage.setItem('cc_lang', language);
     const fetchTopics = async () => {
       try {
         const res = await api.get(`/topics?lang=${language}`);
         setTopics(res.data.topics);
-        if (res.data.topics.length > 0) {
+        
+        const savedTopicId = localStorage.getItem('cc_topic');
+        const savedExerciseId = localStorage.getItem('cc_exercise');
+
+        if (savedTopicId && res.data.topics.some(t => t._id === savedTopicId)) {
+          fetchTopicDetail(savedTopicId, savedExerciseId);
+        } else if (res.data.topics.length > 0) {
           fetchTopicDetail(res.data.topics[0]._id);
         } else {
           setActiveTopic(null);
@@ -73,32 +80,49 @@ const Dashboard = () => {
     fetchTopics();
   }, [language]);
 
-  // Fetch exercises based on language
+  const fetchExercises = async () => {
+    setIsLoading(true);
+    try {
+      if (!activeTopic) return;
+      const res = await api.get(`/exercises?topicId=${activeTopic._id}`);
+      setExercises(res.data.exercises);
+    } catch (err) {
+      console.error('Error fetching exercises:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch exercises based on active topic
   useEffect(() => {
-    const fetchExercises = async () => {
-      setIsLoading(true);
-      try {
-        if (!activeTopic) return;
-        const res = await api.get(`/exercises?topicId=${activeTopic._id}`);
-        setExercises(res.data.exercises);
-      } catch (err) {
-        console.error('Error fetching exercises:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     if (activeTopic) {
+      localStorage.setItem('cc_topic', activeTopic._id);
       fetchExercises();
     } else {
+      localStorage.removeItem('cc_topic');
       setExercises([]);
     }
   }, [activeTopic]);
 
-  const fetchTopicDetail = async (topicId) => {
+  useEffect(() => {
+    if (activeExercise) {
+      localStorage.setItem('cc_exercise', activeExercise._id);
+    } else {
+      localStorage.removeItem('cc_exercise');
+    }
+  }, [activeExercise]);
+
+  const fetchTopicDetail = async (topicId, exerciseIdToRestore = null) => {
     try {
       const res = await api.get(`/topics/${topicId}`);
       setActiveTopic(res.data.topic);
-      setActiveExercise(null); // Back to theory when changing topic
+      
+      if (exerciseIdToRestore) {
+        const exRes = await api.get(`/exercises/${exerciseIdToRestore}`);
+        setActiveExercise(exRes.data.exercise);
+      } else {
+        setActiveExercise(null);
+      }
       setSubmissionResult(null);
     } catch (err) {
       console.error('Error fetching topic detail:', err);
@@ -127,6 +151,10 @@ const Dashboard = () => {
 
   const handleSubmissionComplete = (result) => {
     setSubmissionResult(result);
+    // Refresh exercises to update AC rate and stats
+    if (activeTopic) {
+      fetchExercises();
+    }
   };
 
   return (
