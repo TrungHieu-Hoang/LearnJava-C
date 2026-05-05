@@ -112,11 +112,11 @@ async function executeCode(language, code, input = '') {
     const stdout = (details.stdout || '').replace(/\n$/, '');
     const stderr = (details.stderr || '').trim();
     const buildStderr = (details.build_stderr || '').trim();
-    const exitCode = details.exit_code || 0;
+    const exitCode = parseInt(details.exit_code) || 0;
     const result_status = details.result || '';
 
     // Lỗi biên dịch
-    if (buildStderr && result_status === 'failure') {
+    if (result_status === 'failure' && buildStderr) {
       return {
         stdout: '',
         stderr: `Compile Error:\n${buildStderr}`,
@@ -137,12 +137,23 @@ async function executeCode(language, code, input = '') {
       };
     }
 
-    // Runtime error
-    if (exitCode !== 0) {
+    // Thành công (bao gồm cả trường hợp có stderr nhưng vẫn có output)
+    if (result_status === 'success' || stdout) {
       return {
-        stdout: stdout,
-        stderr: `Runtime Error:\n${stderr || buildStderr}`,
-        exitCode,
+        stdout,
+        stderr,
+        exitCode: 0,
+        timedOut: false,
+        status: 'success'
+      };
+    }
+
+    // Runtime error (không có stdout, exit code != 0)
+    if (exitCode !== 0 || result_status === 'failure') {
+      return {
+        stdout: '',
+        stderr: `Runtime Error:\n${stderr || buildStderr || 'Unknown error'}`,
+        exitCode: exitCode || 1,
         timedOut: false,
         status: 'error'
       };
