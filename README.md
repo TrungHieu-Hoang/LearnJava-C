@@ -61,35 +61,7 @@ npm install
 
 # 3. Khởi chạy giao diện Web
 npm run dev
-```
-
 ---
-
-## ☁️ Hướng dẫn Đẩy lên Cloud (Deploy)
-
-Dự án này đã được tối ưu để hoạt động hoàn hảo với các dịch vụ Cloud hiện đại:
-
-### Bước 1: Deploy Backend (Render.com)
-1. Tạo một Web Service trên Render, kết nối với thư mục `server`.
-2. Cấu hình lệnh:
-   - Build Command: `npm install`
-   - Start Command: `npm start`
-3. Thêm biến môi trường (Environment Variables):
-   - `MONGO_URI`: Chuỗi kết nối MongoDB Atlas của bạn.
-   - `JWT_SECRET`: Chuỗi bảo mật bất kỳ.
-
-### Bước 2: Nạp dữ liệu vào Database
-Do lỗi nhà mạng chặn phân giải DNS (querySrv) khi dùng mạng ở VN, cách tốt nhất để chạy lệnh nạp dữ liệu là chạy trực tiếp trên Cloud:
-- Mở tab **Shell** trong trang quản trị dự án Render.
-- Gõ lệnh `npm run seed` và ấn Enter.
-
-### Bước 3: Deploy Frontend (Vercel)
-1. Sửa URL kết nối Backend trong file `client/src/api/index.js` thành link Render của bạn.
-2. Tạo dự án mới trên Vercel, trỏ thư mục gốc (Root Directory) vào mục `client`.
-3. Bấm Deploy và trải nghiệm.
-
----
-
 ## 📖 Hướng dẫn sử dụng cho người học
 
 1. **Lộ trình học:** Ở menu bên trái, chọn ngôn ngữ bạn muốn học (Java, C++, C, Python). Đi tuần tự từ trên xuống dưới. Bài "Bài 0: Hướng dẫn & Làm quen" sẽ hướng dẫn bạn cú pháp khai báo cơ bản nhất của từng ngôn ngữ.
