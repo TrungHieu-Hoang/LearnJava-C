@@ -1,27 +1,29 @@
 const https = require('https');
 const http = require('http');
 
-const TIMEOUT_MS = 10000; // 10 seconds for API call
+const TIMEOUT_MS = 15000;
 
-// Mapping ngôn ngữ sang compiler Wandbox
-const COMPILER_MAP = {
-  java: 'openjdk-jdk-17.0.1+12',
-  cpp: 'gcc-12.1.0',
-  c: 'gcc-12.1.0-c',
-  python: 'cpython-3.10.2'
+// Wandbox compiler mapping
+const WANDBOX_COMPILERS = {
+  java: 'openjdk-head',
+  cpp: 'gcc-head',
+  c: 'gcc-head-c',
+  python: 'cpython-head'
 };
 
 /**
- * Gọi Wandbox API để biên dịch và chạy code
+ * Gọi Wandbox API
  */
-function callWandbox(compiler, code, stdin = '') {
+function callWandbox(language, code, stdin = '') {
   return new Promise((resolve, reject) => {
-    const payload = JSON.stringify({
+    const compiler = WANDBOX_COMPILERS[language];
+    const body = {
       compiler,
       code,
       stdin,
-      options: compiler.includes('gcc') && !compiler.includes('-c') ? 'warning,gnu++17' : ''
-    });
+      options: language === 'cpp' ? 'warning,gnu++17' : ''
+    };
+    const payload = JSON.stringify(body);
 
     const options = {
       hostname: 'wandbox.org',
@@ -30,8 +32,7 @@ function callWandbox(compiler, code, stdin = '') {
       headers: {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(payload)
-      },
-      timeout: TIMEOUT_MS
+      }
     };
 
     const req = https.request(options, (res) => {
@@ -40,99 +41,108 @@ function callWandbox(compiler, code, stdin = '') {
       res.on('end', () => {
         try {
           const json = JSON.parse(data);
-          resolve(json);
+          const stdout = (json.program_output || '').replace(/\n$/, '');
+          const stderr = json.compiler_error || json.program_error || '';
+          const exitCode = parseInt(json.status || '0');
+          const signal = json.signal || '';
+
+          if (signal) {
+            resolve({ stdout: '', stderr: 'Time Limit Exceeded', exitCode: 1, timedOut: true, status: 'tle' });
+          } else if (exitCode !== 0 && !stdout) {
+            resolve({ stdout: '', stderr: `Error:\n${stderr}`, exitCode, timedOut: false, status: 'error' });
+          } else {
+            resolve({ stdout, stderr, exitCode, timedOut: false, status: 'success' });
+          }
         } catch (e) {
-          reject(new Error('Invalid response from compiler API'));
+          reject(new Error('Wandbox returned invalid response: ' + data.substring(0, 200)));
         }
       });
     });
 
-    req.on('timeout', () => {
-      req.destroy();
-      reject(new Error('API timeout'));
-    });
-
-    req.on('error', (err) => {
-      reject(err);
-    });
-
+    req.setTimeout(TIMEOUT_MS, () => { req.destroy(); reject(new Error('Timeout')); });
+    req.on('error', reject);
     req.write(payload);
     req.end();
   });
 }
 
 /**
- * Run code for a specific language with given input
+ * Fallback: Rextester API (backup nếu Wandbox lỗi)
+ */
+function callRextester(language, code, stdin = '') {
+  return new Promise((resolve, reject) => {
+    // Rextester language codes
+    const langMap = { c: 6, cpp: 7, java: 4, python: 24 };
+    const langCode = langMap[language];
+    if (!langCode) return reject(new Error('Unsupported'));
+
+    const postData = `LanguageChoice=${langCode}&Program=${encodeURIComponent(code)}&Input=${encodeURIComponent(stdin)}`;
+
+    const options = {
+      hostname: 'rextester.com',
+      path: '/rundotnet/api',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => { data += chunk; });
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          const stdout = (json.Result || '').replace(/\n$/, '');
+          const stderr = json.Errors || '';
+          
+          if (stderr && !stdout) {
+            resolve({ stdout: '', stderr, exitCode: 1, timedOut: false, status: 'error' });
+          } else {
+            resolve({ stdout, stderr, exitCode: 0, timedOut: false, status: 'success' });
+          }
+        } catch (e) {
+          reject(new Error('Rextester error'));
+        }
+      });
+    });
+
+    req.setTimeout(TIMEOUT_MS, () => { req.destroy(); reject(new Error('Timeout')); });
+    req.on('error', reject);
+    req.write(postData);
+    req.end();
+  });
+}
+
+/**
+ * Chạy code với fallback: Wandbox -> Rextester
  */
 async function executeCode(language, code, input = '') {
-  const compiler = COMPILER_MAP[language];
-  if (!compiler) {
-    return { stdout: '', stderr: 'Unsupported language', exitCode: 1, timedOut: false, status: 'error' };
+  if (!WANDBOX_COMPILERS[language]) {
+    return { stdout: '', stderr: 'Ngôn ngữ không hỗ trợ', exitCode: 1, timedOut: false, status: 'error' };
   }
 
   try {
-    const result = await callWandbox(compiler, code, input);
-
-    const stdout = (result.program_output || '').trim();
-    const compileErr = result.compiler_error || '';
-    const runtimeErr = result.program_error || '';
-    const signal = result.signal || '';
-    const status_code = result.status || '0';
-
-    // Kiểm tra lỗi biên dịch
-    if (compileErr && !stdout && status_code !== '0') {
+    return await callWandbox(language, code, input);
+  } catch (wandboxErr) {
+    console.log('Wandbox failed, trying Rextester:', wandboxErr.message);
+    try {
+      return await callRextester(language, code, input);
+    } catch (rexErr) {
       return {
         stdout: '',
-        stderr: `Compile Error:\n${compileErr}`,
+        stderr: `Lỗi kết nối compiler. Vui lòng thử lại sau.\n(${wandboxErr.message})`,
         exitCode: 1,
         timedOut: false,
         status: 'error'
       };
     }
-
-    // Kiểm tra timeout/signal
-    if (signal === 'Killed' || signal === '9') {
-      return {
-        stdout: '',
-        stderr: 'Time Limit Exceeded',
-        exitCode: 1,
-        timedOut: true,
-        status: 'tle'
-      };
-    }
-
-    // Kiểm tra runtime error
-    if (status_code !== '0' && !stdout) {
-      return {
-        stdout: '',
-        stderr: `Runtime Error:\n${runtimeErr || compileErr || 'Unknown error'}`,
-        exitCode: 1,
-        timedOut: false,
-        status: 'error'
-      };
-    }
-
-    return {
-      stdout,
-      stderr: runtimeErr || compileErr || '',
-      exitCode: parseInt(status_code) || 0,
-      timedOut: false,
-      status: 'success'
-    };
-
-  } catch (err) {
-    return {
-      stdout: '',
-      stderr: `Server Error: ${err.message}`,
-      exitCode: 1,
-      timedOut: err.message === 'API timeout',
-      status: 'error'
-    };
   }
 }
 
 /**
- * Run code against multiple test cases
+ * Chạy code với nhiều test cases
  */
 async function runTestCases(language, code, testCases) {
   const results = [];
@@ -140,7 +150,6 @@ async function runTestCases(language, code, testCases) {
   for (const testCase of testCases) {
     try {
       const result = await executeCode(language, code, testCase.input);
-
       const actualOutput = (result.stdout || '').trim();
       const expectedOutput = (testCase.expectedOutput || '').trim();
       const passed = actualOutput === expectedOutput;
@@ -154,7 +163,6 @@ async function runTestCases(language, code, testCases) {
         status: result.status
       });
 
-      // Nếu lỗi biên dịch hoặc TLE, bỏ qua các test còn lại
       if (result.status === 'error' || result.status === 'tle') {
         for (let i = results.length; i < testCases.length; i++) {
           results.push({
@@ -174,7 +182,7 @@ async function runTestCases(language, code, testCases) {
         expectedOutput: testCase.expectedOutput,
         actualOutput: '',
         passed: false,
-        error: err.message || 'Unknown error',
+        error: err.message,
         status: 'error'
       });
     }
