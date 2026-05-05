@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
-import { Play, Send, Loader2, TerminalSquare } from 'lucide-react';
+import { Play, Send, Loader2, TerminalSquare, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import api from '../api';
 import './IDEPanel.css';
 
 const IDEPanel = ({ exercise, defaultCode, language }) => {
+  const { setUser } = useAuth();
   const [code, setCode] = useState(defaultCode || '');
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
@@ -73,6 +75,11 @@ const IDEPanel = ({ exercise, defaultCode, language }) => {
       
       if (sub.status === 'accepted') {
         setOutput(`🎉 Chúc mừng! Bạn đã giải thành công.\n+${sub.points} điểm.`);
+        // Cập nhật điểm ngay lập tức trên Navbar
+        try {
+          const meRes = await api.get('/auth/me');
+          setUser(meRes.data.user);
+        } catch (e) {}
       } else {
         setOutput(`❌ Bài giải chưa chính xác. Đã pass ${sub.passedTests}/${sub.totalTests} test cases.`);
       }
