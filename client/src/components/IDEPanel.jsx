@@ -11,7 +11,6 @@ const IDEPanel = ({ exercise, defaultCode, language, onSubmissionComplete }) => 
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState(null);
   const [customInput, setCustomInput] = useState('');
 
