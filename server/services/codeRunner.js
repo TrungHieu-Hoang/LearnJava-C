@@ -1,24 +1,33 @@
 const https = require('https');
 
-const TIMEOUT_MS = 15000;
+const TIMEOUT_MS = 20000;
 
-// ===== REXTESTER API (Primary) =====
-// Rextester language codes
-const REXTESTER_LANGS = { java: 4, c: 6, cpp: 7, python: 24 };
+// Paiza.io language mapping
+const PAIZA_LANGS = {
+  java: 'java',
+  cpp: 'cpp',
+  c: 'c',
+  python: 'python3'
+};
 
-function callRextester(language, code, stdin = '') {
+/**
+ * Bước 1: Tạo runner trên Paiza.io
+ */
+function createRunner(language, code, input = '') {
   return new Promise((resolve, reject) => {
-    const langCode = REXTESTER_LANGS[language];
-    if (!langCode) return reject(new Error('Unsupported language'));
-
-    const postData = `LanguageChoice=${langCode}&Program=${encodeURIComponent(code)}&Input=${encodeURIComponent(stdin)}`;
+    const postData = JSON.stringify({
+      source_code: code,
+      language: PAIZA_LANGS[language],
+      input: input,
+      api_key: 'guest'
+    });
 
     const req = https.request({
-      hostname: 'rextester.com',
-      path: '/rundotnet/api',
+      hostname: 'api.paiza.io',
+      path: '/runners/create',
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(postData)
       }
     }, (res) => {
@@ -27,17 +36,13 @@ function callRextester(language, code, stdin = '') {
       res.on('end', () => {
         try {
           const json = JSON.parse(data);
-          const stdout = (json.Result || '').replace(/\n$/, '');
-          const stderr = (json.Errors || '').trim();
-          const warnings = (json.Warnings || '').trim();
-
-          if (stderr && !stdout) {
-            resolve({ stdout: '', stderr, exitCode: 1, timedOut: false, status: 'error' });
+          if (json.id) {
+            resolve(json.id);
           } else {
-            resolve({ stdout, stderr: stderr || warnings, exitCode: 0, timedOut: false, status: 'success' });
+            reject(new Error('No runner ID: ' + data.substring(0, 200)));
           }
         } catch (e) {
-          reject(new Error('API parse error: ' + data.substring(0, 100)));
+          reject(new Error('Create parse error'));
         }
       });
     });
@@ -49,84 +54,112 @@ function callRextester(language, code, stdin = '') {
   });
 }
 
-// ===== WANDBOX API (Fallback) =====
-const WANDBOX_COMPILERS = {
-  java: 'openjdk-jdk-17.0.1+12',
-  cpp: 'gcc-12.2.0',
-  c: 'gcc-12.2.0-c',
-  python: 'cpython-3.10.2'
-};
-
-function callWandbox(language, code, stdin = '') {
+/**
+ * Bước 2: Lấy kết quả từ Paiza.io (có retry vì code cần thời gian chạy)
+ */
+function getDetails(runnerId, retries = 10) {
   return new Promise((resolve, reject) => {
-    const compiler = WANDBOX_COMPILERS[language];
-    const payload = JSON.stringify({ compiler, code, stdin });
-
-    const req = https.request({
-      hostname: 'wandbox.org',
-      path: '/api/compile.json',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(payload)
-      }
-    }, (res) => {
-      let data = '';
-      res.on('data', chunk => { data += chunk; });
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(data);
-          if (json.error) return reject(new Error(json.error));
-          const stdout = (json.program_output || '').replace(/\n$/, '');
-          const stderr = json.compiler_error || json.program_error || '';
-          const exitCode = parseInt(json.status || '0');
-          const signal = json.signal || '';
-
-          if (signal) {
-            resolve({ stdout: '', stderr: 'Time Limit Exceeded', exitCode: 1, timedOut: true, status: 'tle' });
-          } else if (exitCode !== 0 && !stdout) {
-            resolve({ stdout: '', stderr: `Error:\n${stderr}`, exitCode, timedOut: false, status: 'error' });
-          } else {
-            resolve({ stdout, stderr, exitCode, timedOut: false, status: 'success' });
+    const check = (attempt) => {
+      const req = https.request({
+        hostname: 'api.paiza.io',
+        path: `/runners/get_details?id=${runnerId}&api_key=guest`,
+        method: 'GET'
+      }, (res) => {
+        let data = '';
+        res.on('data', chunk => { data += chunk; });
+        res.on('end', () => {
+          try {
+            const json = JSON.parse(data);
+            
+            if (json.status === 'completed') {
+              resolve(json);
+            } else if (attempt < retries) {
+              // Chờ 1 giây rồi thử lại
+              setTimeout(() => check(attempt + 1), 1000);
+            } else {
+              reject(new Error('Runner timeout'));
+            }
+          } catch (e) {
+            reject(new Error('Details parse error'));
           }
-        } catch (e) {
-          reject(new Error('Wandbox parse error'));
-        }
+        });
       });
-    });
 
-    req.setTimeout(TIMEOUT_MS, () => { req.destroy(); reject(new Error('Timeout')); });
-    req.on('error', reject);
-    req.write(payload);
-    req.end();
+      req.setTimeout(5000, () => { req.destroy(); reject(new Error('Timeout')); });
+      req.on('error', reject);
+      req.end();
+    };
+
+    check(0);
   });
 }
 
 /**
- * Chạy code: Rextester (primary) -> Wandbox (fallback)
+ * Chạy code qua Paiza.io API
  */
 async function executeCode(language, code, input = '') {
-  if (!REXTESTER_LANGS[language]) {
+  if (!PAIZA_LANGS[language]) {
     return { stdout: '', stderr: 'Ngôn ngữ không hỗ trợ', exitCode: 1, timedOut: false, status: 'error' };
   }
 
-  // Thử Rextester trước
   try {
-    const result = await callRextester(language, code, input);
-    return result;
-  } catch (rexErr) {
-    console.log('Rextester failed:', rexErr.message);
-  }
+    // Bước 1: Gửi code lên
+    const runnerId = await createRunner(language, code, input);
 
-  // Fallback sang Wandbox
-  try {
-    const result = await callWandbox(language, code, input);
-    return result;
-  } catch (wbErr) {
-    console.log('Wandbox failed:', wbErr.message);
+    // Bước 2: Chờ kết quả
+    const details = await getDetails(runnerId);
+
+    const stdout = (details.stdout || '').replace(/\n$/, '');
+    const stderr = (details.stderr || '').trim();
+    const buildStderr = (details.build_stderr || '').trim();
+    const exitCode = details.exit_code || 0;
+    const result_status = details.result || '';
+
+    // Lỗi biên dịch
+    if (buildStderr && result_status === 'failure') {
+      return {
+        stdout: '',
+        stderr: `Compile Error:\n${buildStderr}`,
+        exitCode: 1,
+        timedOut: false,
+        status: 'error'
+      };
+    }
+
+    // Timeout
+    if (result_status === 'timeout') {
+      return {
+        stdout: '',
+        stderr: 'Time Limit Exceeded (10s)',
+        exitCode: 1,
+        timedOut: true,
+        status: 'tle'
+      };
+    }
+
+    // Runtime error
+    if (exitCode !== 0) {
+      return {
+        stdout: stdout,
+        stderr: `Runtime Error:\n${stderr || buildStderr}`,
+        exitCode,
+        timedOut: false,
+        status: 'error'
+      };
+    }
+
+    return {
+      stdout,
+      stderr,
+      exitCode: 0,
+      timedOut: false,
+      status: 'success'
+    };
+
+  } catch (err) {
     return {
       stdout: '',
-      stderr: 'Lỗi kết nối compiler. Vui lòng thử lại sau.',
+      stderr: `Lỗi: ${err.message}. Vui lòng thử lại.`,
       exitCode: 1,
       timedOut: false,
       status: 'error'
