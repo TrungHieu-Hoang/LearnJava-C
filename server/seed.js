@@ -191,6 +191,22 @@ const generateMoreExercisesForTopic = (topic, allExercises) => {
                <h4>Dữ liệu ra:</h4><ul><li>3 dòng, mỗi dòng 3 dấu <code>*</code>.</li></ul>
                <h4>Giới hạn:</h4><ul><li>Thời gian thực thi: 1.0s</li></ul>`, 
         tests: [{ i: '', o: `***\n***\n***` }]
+      },
+      { 
+        title: `In hình tam giác`, 
+        desc: `<p>In ra một tam giác vuông bằng dấu sao <code>*</code> có 3 dòng.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Không có.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>Dòng 1: <code>*</code><br>Dòng 2: <code>**</code><br>Dòng 3: <code>***</code></li></ul>
+               <h4>Giới hạn:</h4><ul><li>Thời gian thực thi: 1.0s</li></ul>`, 
+        tests: [{ i: '', o: `*\n**\n***` }]
+      },
+      { 
+        title: `Thông điệp nhiều dòng`, 
+        desc: `<p>In ra 3 dòng: <code>Toi</code>, <code>Dang</code>, <code>Hoc Code</code>.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Không có.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>3 dòng chữ.</li></ul>
+               <h4>Giới hạn:</h4><ul><li>Thời gian thực thi: 1.0s</li></ul>`, 
+        tests: [{ i: '', o: `Toi\nDang\nHoc Code` }]
       }
     ];
   } else if (tTitle.includes('biến') || tTitle.includes('kiểu')) {
@@ -218,6 +234,30 @@ const generateMoreExercisesForTopic = (topic, allExercises) => {
                <h4>Dữ liệu ra:</h4><ul><li>Phần dư <code>a % b</code>.</li></ul>
                <h4>Giới hạn:</h4><ul><li><code>1 &lt;= a, b &lt;= 10^4</code></li></ul>`, 
         tests: [{ i: '10 3', o: `1` }, { i: '5 5', o: `0` }, { i: '14 5', o: `4` }, { i: '2 10', o: `2` }]
+      },
+      { 
+        title: `Chu vi hình chữ nhật`, 
+        desc: `<p>Cho chiều dài <code>a</code> và chiều rộng <code>b</code>. Tính chu vi.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Hai số nguyên dương <code>a, b</code>.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>Chu vi hình chữ nhật.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>1 &lt;= a, b &lt;= 10^4</code></li></ul>`, 
+        tests: [{ i: '3 4', o: `14` }, { i: '5 5', o: `20` }, { i: '10 20', o: `60` }, { i: '1 1', o: `4` }]
+      },
+      { 
+        title: `Bình phương một số`, 
+        desc: `<p>Cho số nguyên <code>X</code>. Tính <code>X * X</code>.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Số nguyên <code>X</code>.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>Bình phương của <code>X</code>.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>-10^4 &lt;= X &lt;= 10^4</code></li></ul>`, 
+        tests: [{ i: '5', o: `25` }, { i: '-5', o: `25` }, { i: '0', o: `0` }, { i: '10', o: `100` }]
+      },
+      { 
+        title: `Trung bình cộng 3 số`, 
+        desc: `<p>Cho 3 số thực <code>a, b, c</code>. In ra trung bình cộng của 3 số, lấy phần nguyên (ép về số nguyên).</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Ba số cách nhau khoảng trắng.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>Phần nguyên của trung bình cộng.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>-10^4 &lt;= a,b,c &lt;= 10^4</code></li></ul>`, 
+        tests: [{ i: '4 5 6', o: `5` }, { i: '10 20 30', o: `20` }, { i: '2 2 3', o: `2` }, { i: '0 0 0', o: `0` }]
       }
     ];
   } else if (tTitle.includes('điều kiện') || tTitle.includes('if')) {
@@ -245,6 +285,30 @@ const generateMoreExercisesForTopic = (topic, allExercises) => {
                <h4>Dữ liệu ra:</h4><ul><li><code>YES</code> hoặc <code>NO</code>.</li></ul>
                <h4>Giới hạn:</h4><ul><li><code>1 &lt;= N &lt;= 10^4</code></li></ul>`, 
         tests: [{ i: '2020', o: `YES` }, { i: '2021', o: `NO` }, { i: '1900', o: `NO` }, { i: '2000', o: `YES` }, { i: '4', o: `YES` }]
+      },
+      { 
+        title: `Kiểm tra tam giác hợp lệ`, 
+        desc: `<p>Cho 3 số nguyên dương <code>a, b, c</code>. Kiểm tra xem chúng có thể tạo thành 3 cạnh của một tam giác không. (Tổng 2 cạnh bất kỳ luôn lớn hơn cạnh còn lại). Nếu có in <code>YES</code>, ngược lại in <code>NO</code>.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Ba số nguyên dương cách nhau khoảng trắng.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li><code>YES</code> hoặc <code>NO</code>.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>1 &lt;= a,b,c &lt;= 10^6</code></li></ul>`, 
+        tests: [{ i: '3 4 5', o: `YES` }, { i: '1 1 5', o: `NO` }, { i: '10 10 10', o: `YES` }, { i: '2 3 5', o: `NO` }]
+      },
+      { 
+        title: `Xếp loại học lực`, 
+        desc: `<p>Cho điểm trung bình <code>D</code> (số nguyên từ 0-10). Nếu D >= 8 in ra <code>GIOI</code>, 6.5 <= D < 8 in ra <code>KHA</code>, 5 <= D < 6.5 in ra <code>TB</code>, còn lại in <code>YEU</code>.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Số nguyên <code>D</code>.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>Kết quả xếp loại.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>0 &lt;= D &lt;= 10</code></li></ul>`, 
+        tests: [{ i: '9', o: `GIOI` }, { i: '7', o: `KHA` }, { i: '5', o: `TB` }, { i: '3', o: `YEU` }, { i: '8', o: `GIOI` }]
+      },
+      { 
+        title: `Kiểm tra số âm dương`, 
+        desc: `<p>Cho số nguyên <code>N</code>. Nếu N > 0 in <code>DUONG</code>, N < 0 in <code>AM</code>, N = 0 in <code>ZERO</code>.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Số nguyên <code>N</code>.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li><code>DUONG</code>, <code>AM</code>, hoặc <code>ZERO</code>.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>-10^9 &lt;= N &lt;= 10^9</code></li></ul>`, 
+        tests: [{ i: '10', o: `DUONG` }, { i: '-5', o: `AM` }, { i: '0', o: `ZERO` }, { i: '9999', o: `DUONG` }]
       }
     ];
   } else if (tTitle.includes('vòng lặp') || tTitle.includes('for')) {
@@ -272,6 +336,30 @@ const generateMoreExercisesForTopic = (topic, allExercises) => {
                <h4>Dữ liệu ra:</h4><ul><li><code>YES</code> hoặc <code>NO</code>.</li></ul>
                <h4>Giới hạn:</h4><ul><li><code>1 &lt;= N &lt;= 10^5</code></li></ul>`, 
         tests: [{ i: '7', o: `YES` }, { i: '10', o: `NO` }, { i: '2', o: `YES` }, { i: '1', o: `NO` }, { i: '97', o: `YES` }]
+      },
+      { 
+        title: `Ước số chung lớn nhất (UCLN)`, 
+        desc: `<p>Tìm Ước số chung lớn nhất của hai số nguyên dương <code>A</code> và <code>B</code>.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Hai số nguyên dương cách nhau khoảng trắng.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>UCLN của 2 số.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>1 &lt;= A, B &lt;= 10^6</code></li></ul>`, 
+        tests: [{ i: '12 18', o: `6` }, { i: '7 5', o: `1` }, { i: '100 50', o: `50` }, { i: '14 28', o: `14` }]
+      },
+      { 
+        title: `Đếm số chữ số`, 
+        desc: `<p>Cho số nguyên dương <code>N</code>. Đếm xem <code>N</code> có bao nhiêu chữ số.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Số nguyên dương <code>N</code>.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>Số lượng chữ số của N.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>1 &lt;= N &lt;= 10^9</code></li></ul>`, 
+        tests: [{ i: '12345', o: `5` }, { i: '7', o: `1` }, { i: '1000000', o: `7` }, { i: '987', o: `3` }]
+      },
+      { 
+        title: `Liệt kê số lẻ`, 
+        desc: `<p>Cho số nguyên dương <code>N</code>. In ra các số lẻ từ 1 đến N, cách nhau bởi khoảng trắng.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Số nguyên dương <code>N</code>.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>Các số lẻ.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>1 &lt;= N &lt;= 100</code></li></ul>`, 
+        tests: [{ i: '5', o: `1 3 5` }, { i: '10', o: `1 3 5 7 9` }, { i: '1', o: `1` }, { i: '6', o: `1 3 5` }]
       }
     ];
   } else if (tTitle.includes('mảng') || tTitle.includes('vector') || tTitle.includes('array')) {
@@ -299,6 +387,30 @@ const generateMoreExercisesForTopic = (topic, allExercises) => {
                <h4>Dữ liệu ra:</h4><ul><li>Số lượng phần tử chẵn.</li></ul>
                <h4>Giới hạn:</h4><ul><li><code>1 &lt;= N &lt;= 100</code></li></ul>`, 
         tests: [{ i: '4\n1 2 3 4', o: `2` }, { i: '3\n1 3 5', o: `0` }, { i: '3\n2 4 6', o: `3` }, { i: '1\n0', o: `1` }, { i: '5\n-2 4 5 7 8', o: `3` }]
+      },
+      { 
+        title: `Tính trung bình cộng mảng`, 
+        desc: `<p>Cho mảng <code>N</code> phần tử. Tính trung bình cộng của mảng (lấy phần nguyên).</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Dòng 1: Số nguyên <code>N</code>.</li><li>Dòng 2: <code>N</code> số nguyên.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>Trung bình cộng (phần nguyên).</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>1 &lt;= N &lt;= 100</code></li></ul>`, 
+        tests: [{ i: '3\n10 20 30', o: `20` }, { i: '4\n1 2 3 4', o: `2` }, { i: '1\n50', o: `50` }, { i: '2\n-10 10', o: `0` }]
+      },
+      { 
+        title: `Tìm vị trí phần tử x`, 
+        desc: `<p>Cho mảng <code>N</code> phần tử và một số <code>x</code>. In ra vị trí đầu tiên của <code>x</code> trong mảng (Index bắt đầu từ 0). Nếu không tìm thấy, in ra <code>-1</code>.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Dòng 1: Hai số nguyên <code>N</code> và <code>x</code>.</li><li>Dòng 2: <code>N</code> số nguyên của mảng.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>Vị trí của x hoặc -1.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>1 &lt;= N &lt;= 100</code></li></ul>`, 
+        tests: [{ i: '4 3\n1 2 3 4', o: `2` }, { i: '5 10\n1 5 8 9 2', o: `-1` }, { i: '3 5\n5 5 5', o: `0` }, { i: '1 0\n0', o: `0` }]
+      },
+      { 
+        title: `In mảng đảo ngược`, 
+        desc: `<p>Cho mảng <code>N</code> phần tử. In ra mảng theo thứ tự đảo ngược, các phần tử cách nhau khoảng trắng.</p>
+               <h4>Dữ liệu vào:</h4><ul><li>Dòng 1: Số nguyên <code>N</code>.</li><li>Dòng 2: <code>N</code> số nguyên.</li></ul>
+               <h4>Dữ liệu ra:</h4><ul><li>Mảng đảo ngược.</li></ul>
+               <h4>Giới hạn:</h4><ul><li><code>1 &lt;= N &lt;= 100</code></li></ul>`, 
+        tests: [{ i: '4\n1 2 3 4', o: `4 3 2 1` }, { i: '3\n10 20 30', o: `30 20 10` }, { i: '1\n9', o: `9` }, { i: '5\n-1 -2 -3 -4 -5', o: `-5 -4 -3 -2 -1` }]
       }
     ];
   } else {
