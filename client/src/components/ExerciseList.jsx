@@ -1,5 +1,5 @@
 import React from 'react';
-import { Target, CheckCircle } from 'lucide-react';
+import { Target, CheckCircle, Check } from 'lucide-react';
 import './ExerciseList.css';
 
 const getSourceBadgeColor = (source) => {
@@ -33,9 +33,14 @@ const ExerciseList = ({ exercises, onSelectExercise }) => {
         {exercises.map(exercise => (
           <div 
             key={exercise._id} 
-            className="exercise-card glass-panel"
+            className={`exercise-card glass-panel ${exercise.isSolved ? 'solved' : ''}`}
             onClick={() => onSelectExercise(exercise)}
           >
+            {exercise.isSolved && (
+              <div className="solved-badge" title="Đã hoàn thành">
+                <Check size={14} strokeWidth={3} />
+              </div>
+            )}
             <div className="exercise-card-header">
               <span 
                 className="badge badge-source" 

@@ -2,10 +2,12 @@ const express = require('express');
 const Exercise = require('../models/Exercise');
 const { auth, optionalAuth } = require('../middleware/auth');
 
+const Submission = require('../models/Submission');
+
 const router = express.Router();
 
 // GET /api/exercises?lang=java&difficulty=easy&source=LeetCode
-router.get('/', async (req, res) => {
+router.get('/', optionalAuth, async (req, res) => {
   try {
     const { lang, difficulty, source, search, topicId } = req.query;
     const filter = {};
@@ -25,12 +27,22 @@ router.get('/', async (req, res) => {
       .select('-testCases')
       .sort({ difficulty: 1, title: 1 });
 
-    // Calculate AC rate
+    let solvedExerciseIds = new Set();
+    if (req.userId) {
+      const solved = await Submission.find({ 
+        userId: req.userId, 
+        status: 'accepted' 
+      }).select('exerciseId');
+      solved.forEach(s => solvedExerciseIds.add(s.exerciseId.toString()));
+    }
+
+    // Calculate AC rate and attach isSolved
     const exercisesWithRate = exercises.map(ex => {
       const obj = ex.toObject();
       obj.acRate = ex.totalSubmissions > 0 
         ? Math.round((ex.acceptedSubmissions / ex.totalSubmissions) * 100) 
         : 0;
+      obj.isSolved = solvedExerciseIds.has(obj._id.toString());
       return obj;
     });
 
