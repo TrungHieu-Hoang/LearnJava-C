@@ -178,7 +178,7 @@ const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 const generateMoreExercisesForTopic = (topic, allExercises) => {
   const difficulties = ['easy', 'medium', 'hard'];
   const sources = ['Codeforces', 'LeetCode', 'HackerRank', 'VNOJ'];
-  const tags = ['math', 'string', 'array', 'sorting', 'greedy', 'dp'];
+  const tags = ['math', 'string', 'array', 'sorting', 'greedy', 'dp', 'logic'];
   const lang = topic.language;
   const tTitle = topic.title.toLowerCase();
 
@@ -188,96 +188,181 @@ const generateMoreExercisesForTopic = (topic, allExercises) => {
   else if (lang === 'c') starter = '#include <stdio.h>\n\nint main() {\n    // Code của bạn ở đây\n    \n    return 0;\n}';
   else if (lang === 'python') starter = '# Code của bạn ở đây\n\n';
 
-  const categoryTemplates = [];
+  let templates = [];
 
-  // Sinh 20 bài tập ngẫu nhiên cho mỗi lộ trình/topic
-  for (let i = 1; i <= 20; i++) {
-    let title, desc, tests = [];
-    
-    // Tạo 10 test cases cho mỗi bài tập
-    if (tTitle.includes('làm quen') || tTitle.includes('hello')) {
-      const msg = ['Hello World', 'CodeCamp', 'Xin Chao', 'Lap Trinh', 'Java C++ Python'][randInt(0, 4)] + ` ${i}`;
-      title = `In thông điệp ${i}`;
-      desc = `<p>Bạn hãy viết chương trình in ra màn hình chính xác dòng chữ: <code>${msg}</code></p>
-              <h4>Dữ liệu vào:</h4><ul><li>Không có dữ liệu đầu vào.</li></ul>
-              <h4>Dữ liệu ra:</h4><ul><li>Dòng chữ <code>${msg}</code></li></ul>`;
-      for(let t=0; t<10; t++) tests.push({ i: '', o: msg });
-    } 
-    else if (tTitle.includes('biến') || tTitle.includes('kiểu')) {
-      const operations = ['+', '-', '*'];
-      const op = operations[i % 3];
-      title = `Phép toán ${op} với số ${i}`;
-      desc = `<p>Cho hai số nguyên <code>a</code> và <code>b</code>. Tính và in ra kết quả của <code>a ${op} b</code>.</p>
-              <h4>Dữ liệu vào:</h4><ul><li>Hai số <code>a, b</code> cách nhau bởi khoảng trắng.</li></ul>
-              <h4>Dữ liệu ra:</h4><ul><li>Kết quả <code>a ${op} b</code>.</li></ul>`;
-      for(let t=0; t<12; t++) {
-        let a = randInt(-1000, 1000), b = randInt(-1000, 1000);
-        let ans = op === '+' ? a + b : (op === '-' ? a - b : a * b);
-        tests.push({ i: `${a} ${b}`, o: `${ans}` });
-      }
-    } 
-    else if (tTitle.includes('điều kiện') || tTitle.includes('if')) {
-      title = `Kiểm tra số chia hết cho ${i + 1}`;
-      let div = (i % 9) + 2;
-      desc = `<p>Cho số nguyên <code>N</code>. Kiểm tra xem <code>N</code> có chia hết cho <code>${div}</code> hay không. Nếu có in <code>YES</code>, nếu không in <code>NO</code>.</p>`;
-      for(let t=0; t<10; t++) {
-        let n = randInt(-10000, 10000);
-        tests.push({ i: `${n}`, o: n % div === 0 ? 'YES' : 'NO' });
-      }
-    } 
-    else if (tTitle.includes('vòng lặp') || tTitle.includes('for')) {
-      title = `Tính tổng từ 1 đến N (Bài ${i})`;
-      let multiplier = randInt(1, 5);
-      desc = `<p>Tính tổng dãy số <code>${multiplier}*1 + ${multiplier}*2 + ... + ${multiplier}*N</code>.</p>
-              <h4>Dữ liệu vào:</h4><ul><li>Số nguyên dương <code>N</code>.</li></ul>
-              <h4>Dữ liệu ra:</h4><ul><li>Tổng tính được.</li></ul>`;
-      for(let t=0; t<10; t++) {
-        let n = randInt(1, 100);
-        let sum = (n * (n + 1) / 2) * multiplier;
-        tests.push({ i: `${n}`, o: `${sum}` });
-      }
-    } 
-    else if (tTitle.includes('mảng') || tTitle.includes('vector') || tTitle.includes('array')) {
-      title = `Xử lý mảng (Version ${i})`;
-      let target = randInt(1, 10);
-      desc = `<p>Cho mảng có <code>N</code> phần tử. Đếm xem có bao nhiêu số lớn hơn hoặc bằng <code>${target}</code> trong mảng.</p>
-              <h4>Dữ liệu vào:</h4><ul><li>Dòng 1: Số nguyên <code>N</code>.</li><li>Dòng 2: <code>N</code> số nguyên.</li></ul>
-              <h4>Dữ liệu ra:</h4><ul><li>Số lượng phần tử thỏa mãn.</li></ul>`;
-      for(let t=0; t<10; t++) {
-        let n = randInt(5, 20);
-        let arr = Array.from({length: n}, () => randInt(-20, 20));
-        let count = arr.filter(x => x >= target).length;
-        tests.push({ i: `${n}\n${arr.join(' ')}`, o: `${count}` });
-      }
-    } 
-    else {
-      // Hàm, Chuỗi, Cấu trúc, Thuật toán, Xử lý lỗi...
-      title = `Bài tập tổng hợp ${i}`;
-      let c = randInt(1, 100);
-      desc = `<p>Cho số nguyên <code>X</code>. In ra giá trị <code>X + ${c}</code>.</p>`;
-      for(let t=0; t<10; t++) {
-        let x = randInt(-1000, 1000);
-        tests.push({ i: `${x}`, o: `${x + c}` });
-      }
+  // 1. LÀM QUEN
+  if (tTitle.includes('làm quen') || tTitle.includes('hello')) {
+    const greetings = ["Hello World", "Xin Chao", "Lap Trinh", "CodeCamp", "Welcome", "Toi yeu Code", "Java C++ Python", "Start", "Beginner", "Test", "System", "Online Judge", "Compiler", "Success", "Passed", "Accepted", "Wrong Answer", "Time Limit", "Memory", "End"];
+    for(let i=0; i<20; i++) {
+      templates.push({
+        t: `In thông điệp: ${greetings[i]}`,
+        d: `Viết chương trình in ra chính xác dòng chữ: <code>${greetings[i]}</code>`,
+        gen: () => ({ i: '', o: greetings[i] })
+      });
     }
-
-    categoryTemplates.push({ title, desc, tests });
+  } 
+  // 2. BIẾN VÀ TOÁN TỬ
+  else if (tTitle.includes('biến') || tTitle.includes('kiểu')) {
+    templates = [
+      { t: "Tổng 2 số", d: "Cho 2 số nguyên a, b. In ra tổng a + b", gen: () => { let a=randInt(-100,100), b=randInt(-100,100); return {i:`${a} ${b}`, o:`${a+b}`}; } },
+      { t: "Hiệu 2 số", d: "Cho 2 số nguyên a, b. In ra hiệu a - b", gen: () => { let a=randInt(-100,100), b=randInt(-100,100); return {i:`${a} ${b}`, o:`${a-b}`}; } },
+      { t: "Tích 2 số", d: "Cho 2 số nguyên a, b. In ra tích a * b", gen: () => { let a=randInt(-50,50), b=randInt(-50,50); return {i:`${a} ${b}`, o:`${a*b}`}; } },
+      { t: "Chia nguyên", d: "Cho a, b. In ra phần nguyên của a chia b (a/b)", gen: () => { let a=randInt(1,100), b=randInt(1,20); return {i:`${a} ${b}`, o:`${Math.floor(a/b)}`}; } },
+      { t: "Chia dư", d: "Cho a, b. In ra phần dư a % b", gen: () => { let a=randInt(1,100), b=randInt(1,20); return {i:`${a} ${b}`, o:`${a%b}`}; } },
+      { t: "Diện tích HCN", d: "Cho chiều dài x, chiều rộng y. Tính diện tích", gen: () => { let a=randInt(1,50), b=randInt(1,50); return {i:`${a} ${b}`, o:`${a*b}`}; } },
+      { t: "Chu vi HCN", d: "Cho chiều dài x, chiều rộng y. Tính chu vi", gen: () => { let a=randInt(1,50), b=randInt(1,50); return {i:`${a} ${b}`, o:`${2*(a+b)}`}; } },
+      { t: "Bình phương", d: "Cho n. Tính n^2", gen: () => { let a=randInt(-100,100); return {i:`${a}`, o:`${a*a}`}; } },
+      { t: "Lập phương", d: "Cho n. Tính n^3", gen: () => { let a=randInt(-50,50); return {i:`${a}`, o:`${a*a*a}`}; } },
+      { t: "Trung bình cộng", d: "Cho 2 số a, b. Tính trung bình cộng (lấy phần nguyên)", gen: () => { let a=randInt(-100,100), b=randInt(-100,100); return {i:`${a} ${b}`, o:`${Math.floor((a+b)/2)}`}; } },
+      { t: "Đổi giờ sang phút", d: "Cho h giờ. Hỏi bằng bao nhiêu phút?", gen: () => { let a=randInt(1,100); return {i:`${a}`, o:`${a*60}`}; } },
+      { t: "Đổi phút sang giây", d: "Cho m phút. Hỏi bằng bao nhiêu giây?", gen: () => { let a=randInt(1,100); return {i:`${a}`, o:`${a*60}`}; } },
+      { t: "Tính tuổi", d: "Cho năm sinh y. Tính tuổi vào năm 2030", gen: () => { let a=randInt(1900, 2030); return {i:`${a}`, o:`${2030-a}`}; } },
+      { t: "Tiền lương", d: "Cho số giờ làm h, lương mỗi giờ w. Tính tổng lương", gen: () => { let a=randInt(1,40), b=randInt(10,50); return {i:`${a} ${b}`, o:`${a*b}`}; } },
+      { t: "Điểm trung bình", d: "Cho điểm Toán, Văn, Anh. Tính tổng điểm", gen: () => { let a=randInt(0,10), b=randInt(0,10), c=randInt(0,10); return {i:`${a} ${b} ${c}`, o:`${a+b+c}`}; } },
+      { t: "Tổng 3 số", d: "Cho a, b, c. Tính a + b + c", gen: () => { let a=randInt(-50,50), b=randInt(-50,50), c=randInt(-50,50); return {i:`${a} ${b} ${c}`, o:`${a+b+c}`}; } },
+      { t: "Nhân 3 số", d: "Cho a, b, c. Tính a * b * c", gen: () => { let a=randInt(-10,10), b=randInt(-10,10), c=randInt(-10,10); return {i:`${a} ${b} ${c}`, o:`${a*b*c}`}; } },
+      { t: "Chu vi tam giác", d: "Cho 3 cạnh a, b, c. Tính chu vi", gen: () => { let a=randInt(1,50), b=randInt(1,50), c=randInt(1,50); return {i:`${a} ${b} ${c}`, o:`${a+b+c}`}; } },
+      { t: "Giá sau thuế", d: "Cho giá tiền p. Tính giá sau khi thêm thuế 10% (p + p/10, lấy nguyên)", gen: () => { let a=randInt(10,1000)*10; return {i:`${a}`, o:`${Math.floor(a*1.1)}`}; } },
+      { t: "Đổi ngày sang giờ", d: "Cho d ngày. Hỏi bằng bao nhiêu giờ?", gen: () => { let a=randInt(1,365); return {i:`${a}`, o:`${a*24}`}; } }
+    ];
+  }
+  // 3. ĐIỀU KIỆN
+  else if (tTitle.includes('điều kiện') || tTitle.includes('if')) {
+    templates = [
+      { t: "Chẵn hay lẻ", d: "Cho N. N chẵn in CHAN, lẻ in LE", gen: () => { let a=randInt(-100,100); return {i:`${a}`, o: a%2===0 ? "CHAN" : "LE"}; } },
+      { t: "Âm dương", d: "Cho N. N > 0 in DUONG, N < 0 in AM, N = 0 in ZERO", gen: () => { let a=randInt(-10,10); return {i:`${a}`, o: a>0 ? "DUONG" : (a<0 ? "AM" : "ZERO")}; } },
+      { t: "Lớn hơn 100", d: "N > 100 in YES, ngược lại in NO", gen: () => { let a=randInt(0,200); return {i:`${a}`, o: a>100 ? "YES" : "NO"}; } },
+      { t: "Chia hết cho 3", d: "N chia hết cho 3 in YES, ngược lại in NO", gen: () => { let a=randInt(1,100); return {i:`${a}`, o: a%3===0 ? "YES" : "NO"}; } },
+      { t: "Chia hết cho 5", d: "N chia hết cho 5 in YES, ngược lại in NO", gen: () => { let a=randInt(1,100); return {i:`${a}`, o: a%5===0 ? "YES" : "NO"}; } },
+      { t: "Max 2 số", d: "Cho a, b. In ra số lớn hơn", gen: () => { let a=randInt(-100,100), b=randInt(-100,100); return {i:`${a} ${b}`, o:`${Math.max(a,b)}`}; } },
+      { t: "Min 2 số", d: "Cho a, b. In ra số nhỏ hơn", gen: () => { let a=randInt(-100,100), b=randInt(-100,100); return {i:`${a} ${b}`, o:`${Math.min(a,b)}`}; } },
+      { t: "Năm nhuận", d: "Năm N có là năm nhuận không? (YES/NO)", gen: () => { let a=randInt(1900,2100); let isL = (a%400===0 || (a%4===0 && a%100!==0)); return {i:`${a}`, o: isL ? "YES" : "NO"}; } },
+      { t: "Max 3 số", d: "Cho a, b, c. In ra số lớn nhất", gen: () => { let a=randInt(-100,100), b=randInt(-100,100), c=randInt(-100,100); return {i:`${a} ${b} ${c}`, o:`${Math.max(a,b,c)}`}; } },
+      { t: "Min 3 số", d: "Cho a, b, c. In ra số nhỏ nhất", gen: () => { let a=randInt(-100,100), b=randInt(-100,100), c=randInt(-100,100); return {i:`${a} ${b} ${c}`, o:`${Math.min(a,b,c)}`}; } },
+      { t: "Đậu hay rớt", d: "Điểm N >= 50 in PASS, ngược lại in FAIL", gen: () => { let a=randInt(0,100); return {i:`${a}`, o: a>=50 ? "PASS" : "FAIL"}; } },
+      { t: "Số nguyên dương", d: "N >= 0 in POSITIVE, N < 0 in NEGATIVE", gen: () => { let a=randInt(-50,50); return {i:`${a}`, o: a>=0 ? "POSITIVE" : "NEGATIVE"}; } },
+      { t: "Người lớn tuổi", d: "Tuổi N >= 18 in ADULT, N < 18 in CHILD", gen: () => { let a=randInt(1,100); return {i:`${a}`, o: a>=18 ? "ADULT" : "CHILD"}; } },
+      { t: "Số có 2 chữ số", d: "N >= 10 và N <= 99 in YES, ngược lại in NO", gen: () => { let a=randInt(0,150); return {i:`${a}`, o: (a>=10 && a<=99) ? "YES" : "NO"}; } },
+      { t: "Tam giác hợp lệ", d: "Cho a,b,c. Có tạo thành tam giác không? (YES/NO)", gen: () => { let a=randInt(1,10), b=randInt(1,10), c=randInt(1,10); let ok = a+b>c && a+c>b && b+c>a; return {i:`${a} ${b} ${c}`, o: ok?"YES":"NO"}; } },
+      { t: "Nhiệt độ sôi", d: "Độ C >= 100 in BOIL, ngược lại in NOT BOIL", gen: () => { let a=randInt(0,150); return {i:`${a}`, o: a>=100 ? "BOIL" : "NOT BOIL"}; } },
+      { t: "Số lớn hơn 0 và chẵn", d: "N > 0 và chẵn in YES, ngược lại in NO", gen: () => { let a=randInt(-20,20); return {i:`${a}`, o: (a>0 && a%2===0)?"YES":"NO"}; } },
+      { t: "Bội số của 10", d: "N chia hết cho 10 in YES, ngược lại in NO", gen: () => { let a=randInt(1,200); return {i:`${a}`, o: a%10===0 ? "YES" : "NO"}; } },
+      { t: "Học sinh giỏi", d: "Điểm N >= 8 in GIOI, N < 8 in KHONG GIOI", gen: () => { let a=randInt(0,10); return {i:`${a}`, o: a>=8 ? "GIOI" : "KHONG GIOI"}; } },
+      { t: "Hai số bằng nhau", d: "a == b in EQUAL, a != b in NOT EQUAL", gen: () => { let a=randInt(1,5), b=randInt(1,5); return {i:`${a} ${b}`, o: a===b?"EQUAL":"NOT EQUAL"}; } }
+    ];
+  }
+  // 4. VÒNG LẶP
+  else if (tTitle.includes('vòng lặp') || tTitle.includes('for')) {
+    templates = [
+      { t: "Tổng 1 đến N", d: "Tính 1 + 2 + ... + N", gen: () => { let n=randInt(1,50); let sum = n*(n+1)/2; return {i:`${n}`, o:`${sum}`}; } },
+      { t: "Giai thừa N", d: "Tính N! = 1 * 2 * ... * N", gen: () => { let n=randInt(1,10); let f=1; for(let j=1;j<=n;j++) f*=j; return {i:`${n}`, o:`${f}`}; } },
+      { t: "Tổng chẵn 1..N", d: "Tính tổng các số chẵn <= N", gen: () => { let n=randInt(1,50); let sum=0; for(let j=2;j<=n;j+=2) sum+=j; return {i:`${n}`, o:`${sum}`}; } },
+      { t: "Tổng lẻ 1..N", d: "Tính tổng các số lẻ <= N", gen: () => { let n=randInt(1,50); let sum=0; for(let j=1;j<=n;j+=2) sum+=j; return {i:`${n}`, o:`${sum}`}; } },
+      { t: "Số lượng ước số", d: "Đếm N có bao nhiêu ước số", gen: () => { let n=randInt(1,100); let c=0; for(let j=1;j<=n;j++) if(n%j===0) c++; return {i:`${n}`, o:`${c}`}; } },
+      { t: "In N dấu *", d: "In ra N dấu * liền nhau", gen: () => { let n=randInt(1,20); return {i:`${n}`, o: "*".repeat(n)}; } },
+      { t: "Bảng cửu chương", d: "Cho N. In N*5", gen: () => { let n=randInt(1,10); return {i:`${n}`, o:`${n*5}`}; } },
+      { t: "Đếm số chữ số", d: "N có bao nhiêu chữ số", gen: () => { let n=randInt(10,1000000); return {i:`${n}`, o:`${String(n).length}`}; } },
+      { t: "Tổng các chữ số", d: "Tính tổng các chữ số của N", gen: () => { let n=randInt(10,1000000); let s=String(n).split('').reduce((a,b)=>a+parseInt(b),0); return {i:`${n}`, o:`${s}`}; } },
+      { t: "Kiểm tra nguyên tố", d: "N có phải số nguyên tố? YES/NO", gen: () => { let n=randInt(1,50); let p=n>1; for(let j=2;j*j<=n;j++) if(n%j===0) p=false; return {i:`${n}`, o: p?"YES":"NO"}; } },
+      { t: "In dãy giảm", d: "Cho N. In dãy giảm từ N về 1, cách nhau bởi khoảng trắng", gen: () => { let n=randInt(1,10); let r=[]; for(let j=n;j>=1;j--) r.push(j); return {i:`${n}`, o:r.join(" ")}; } },
+      { t: "Bình phương 1..N", d: "Tổng các bình phương 1^2 + 2^2 + .. + N^2", gen: () => { let n=randInt(1,20); let s=0; for(let j=1;j<=n;j++) s+=j*j; return {i:`${n}`, o:`${s}`}; } },
+      { t: "Chữ số lớn nhất", d: "Tìm chữ số lớn nhất của N", gen: () => { let n=randInt(10,1000000); let m=Math.max(...String(n).split('').map(Number)); return {i:`${n}`, o:`${m}`}; } },
+      { t: "Chữ số chẵn", d: "Đếm số lượng chữ số chẵn của N", gen: () => { let n=randInt(10,1000000); let c=String(n).split('').filter(x=>x%2===0).length; return {i:`${n}`, o:`${c}`}; } },
+      { t: "Tổng ước số", d: "Tổng các ước của N", gen: () => { let n=randInt(1,50); let s=0; for(let j=1;j<=n;j++) if(n%j===0) s+=j; return {i:`${n}`, o:`${s}`}; } },
+      { t: "Số hoàn hảo", d: "N có là số hoàn hảo (Tổng ước nhỏ hơn nó = chính nó)? YES/NO", gen: () => { let n=randInt(2,30); let s=0; for(let j=1;j<n;j++) if(n%j===0) s+=j; return {i:`${n}`, o: s===n?"YES":"NO"}; } },
+      { t: "Số Fibonacci", d: "Tìm F(N) với F(1)=1, F(2)=1. N <= 20", gen: () => { let n=randInt(1,20); let a=1,b=1; for(let j=3;j<=n;j++) { let t=a+b; a=b; b=t; } return {i:`${n}`, o:`${b}`}; } },
+      { t: "Chữ số tận cùng", d: "In chữ số tận cùng của N", gen: () => { let n=randInt(10,100000); return {i:`${n}`, o:`${n%10}`}; } },
+      { t: "Lặp N lần", d: "Cho N. In chữ 'A' N lần liền nhau", gen: () => { let n=randInt(1,20); return {i:`${n}`, o: "A".repeat(n)}; } },
+      { t: "Tổng các số chia hết 3", d: "Tổng các số chia hết cho 3 từ 1..N", gen: () => { let n=randInt(1,50); let s=0; for(let j=3;j<=n;j+=3) s+=j; return {i:`${n}`, o:`${s}`}; } }
+    ];
+  }
+  // 5. MẢNG
+  else if (tTitle.includes('mảng') || tTitle.includes('array') || tTitle.includes('vector')) {
+    templates = [
+      { t: "Tổng mảng", d: "Tính tổng N phần tử", opArr: (arr) => arr.reduce((a,b)=>a+b,0) },
+      { t: "Max mảng", d: "Tìm phần tử lớn nhất", opArr: (arr) => Math.max(...arr) },
+      { t: "Min mảng", d: "Tìm phần tử nhỏ nhất", opArr: (arr) => Math.min(...arr) },
+      { t: "Đếm số chẵn", d: "Đếm số lượng số chẵn", opArr: (arr) => arr.filter(x=>x%2===0).length },
+      { t: "Đếm số lẻ", d: "Đếm số lượng số lẻ", opArr: (arr) => arr.filter(x=>x%2!==0).length },
+      { t: "Đếm số âm", d: "Đếm số lượng phần tử âm", opArr: (arr) => arr.filter(x=>x<0).length },
+      { t: "Đếm số dương", d: "Đếm số lượng phần tử dương (>0)", opArr: (arr) => arr.filter(x=>x>0).length },
+      { t: "Tổng các số chẵn", d: "Tính tổng các phần tử chẵn", opArr: (arr) => arr.filter(x=>x%2===0).reduce((a,b)=>a+b,0) },
+      { t: "Tổng các số lẻ", d: "Tính tổng các phần tử lẻ", opArr: (arr) => arr.filter(x=>x%2!==0).reduce((a,b)=>a+b,0) },
+      { t: "Trung bình cộng mảng", d: "Tính TBC mảng (lấy phần nguyên)", opArr: (arr) => Math.floor(arr.reduce((a,b)=>a+b,0)/arr.length) },
+      { t: "Phần tử đầu và cuối", d: "Tính tổng phần tử đầu tiên và cuối cùng", opArr: (arr) => arr[0] + arr[arr.length-1] },
+      { t: "Có số 0 không?", d: "Mảng có số 0 không? In 1 nếu có, 0 nếu không", opArr: (arr) => arr.includes(0)?1:0 },
+      { t: "Đếm phần tử > 10", d: "Đếm số lượng phần tử > 10", opArr: (arr) => arr.filter(x=>x>10).length },
+      { t: "In đảo ngược mảng", d: "In các phần tử theo chiều ngược lại, cách khoảng trắng", opArrStr: (arr) => arr.slice().reverse().join(' ') },
+      { t: "Sắp xếp tăng dần", d: "In mảng đã sắp xếp tăng dần, cách khoảng trắng", opArrStr: (arr) => arr.slice().sort((a,b)=>a-b).join(' ') },
+      { t: "Phần tử ở index chẵn", d: "Tổng các phần tử ở vị trí 0, 2, 4...", opArr: (arr) => arr.filter((_,i)=>i%2===0).reduce((a,b)=>a+b,0) },
+      { t: "Hiệu Max và Min", d: "Tính chênh lệch giữa phần tử lớn nhất và nhỏ nhất", opArr: (arr) => Math.max(...arr) - Math.min(...arr) },
+      { t: "Nhân đôi mảng", d: "In ra mảng với mỗi phần tử được nhân 2", opArrStr: (arr) => arr.map(x=>x*2).join(' ') },
+      { t: "Số lượng số chục", d: "Đếm phần tử chia hết cho 10", opArr: (arr) => arr.filter(x=>x%10===0).length },
+      { t: "Tích số dương", d: "Tính tích các phần tử dương (Nếu không có in 0)", opArr: (arr) => { let pos = arr.filter(x=>x>0); return pos.length ? pos.reduce((a,b)=>a*b,1) : 0; } }
+    ];
+    templates = templates.map(t => {
+      return {
+        t: t.t,
+        d: `<p>${t.d}.</p><h4>Dữ liệu vào:</h4><ul><li>Dòng 1: Số nguyên <code>N</code>.</li><li>Dòng 2: <code>N</code> số nguyên.</li></ul>`,
+        gen: () => {
+          let n = randInt(3, 10);
+          let arr = Array.from({length: n}, () => randInt(-20, 20));
+          let res = t.opArrStr ? t.opArrStr(arr) : t.opArr(arr);
+          return { i: `${n}\n${arr.join(' ')}`, o: `${res}` };
+        }
+      };
+    });
+  }
+  // 6. CÁC TOPIC KHÁC (Hàm, Chuỗi, Struct, Exceptions, OOP...)
+  else {
+    templates = [
+      { t: "Mã hóa đơn giản", d: "Cho N. Trả về N + 100", gen: () => { let a=randInt(1,100); return {i:`${a}`, o:`${a+100}`}; } },
+      { t: "Nhân ba", d: "Cho N. Trả về N * 3", gen: () => { let a=randInt(1,100); return {i:`${a}`, o:`${a*3}`}; } },
+      { t: "Bình phương", d: "Trả về N * N", gen: () => { let a=randInt(1,50); return {i:`${a}`, o:`${a*a}`}; } },
+      { t: "Giá trị tuyệt đối", d: "Cho số N. In ra giá trị tuyệt đối |N|", gen: () => { let a=randInt(-100,100); return {i:`${a}`, o:`${Math.abs(a)}`}; } },
+      { t: "Phân loại", d: "N>0 in A, N=0 in B, N<0 in C", gen: () => { let a=randInt(-10,10); return {i:`${a}`, o: a>0?"A":(a<0?"C":"B")}; } },
+      { t: "Phép cộng ngẫu nhiên", d: "Cho N. In ra N + 50", gen: () => { let a=randInt(1,100); return {i:`${a}`, o:`${a+50}`}; } },
+      { t: "Kiểm tra bằng 0", d: "Nếu N=0 in EMPTY, ngược lại in HAS VALUE", gen: () => { let a=randInt(0,5); return {i:`${a}`, o: a===0?"EMPTY":"HAS VALUE"}; } },
+      { t: "Làm tròn số", d: "Cho số nguyên N chia 3. Làm tròn xuống.", gen: () => { let a=randInt(1,50); return {i:`${a}`, o:`${Math.floor(a/3)}`}; } },
+      { t: "Đếm ngược", d: "Cho N, in ra N-1", gen: () => { let a=randInt(1,100); return {i:`${a}`, o:`${a-1}`}; } },
+      { t: "Nhân đôi", d: "Cho N, in N*2", gen: () => { let a=randInt(1,100); return {i:`${a}`, o:`${a*2}`}; } },
+      { t: "Kiểm tra bằng 10", d: "N == 10 in TEN, khác in NOT TEN", gen: () => { let a=randInt(5,15); return {i:`${a}`, o: a===10?"TEN":"NOT TEN"}; } },
+      { t: "Chia hết cho 4", d: "N chia hết cho 4 in 1, ngược lại in 0", gen: () => { let a=randInt(1,20); return {i:`${a}`, o: a%4===0?"1":"0"}; } },
+      { t: "Tính tuổi nhân 2", d: "In ra N * 2", gen: () => { let a=randInt(1,50); return {i:`${a}`, o:`${a*2}`}; } },
+      { t: "Khác 0", d: "N != 0 in OK, N == 0 in ZERO", gen: () => { let a=randInt(0,5); return {i:`${a}`, o: a!==0?"OK":"ZERO"}; } },
+      { t: "Hiệu với 100", d: "In ra 100 - N", gen: () => { let a=randInt(1,100); return {i:`${a}`, o:`${100-a}`}; } },
+      { t: "Tích bình phương", d: "Cho N. In N^2 * 2", gen: () => { let a=randInt(1,20); return {i:`${a}`, o:`${a*a*2}`}; } },
+      { t: "Kiểm tra chẵn", d: "N chẵn in EVEN, lẻ in ODD", gen: () => { let a=randInt(1,100); return {i:`${a}`, o: a%2===0?"EVEN":"ODD"}; } },
+      { t: "Chữ số đầu tiên giả", d: "In ra ký tự đầu tiên của N khi chuyển thành chuỗi", gen: () => { let a=randInt(10,99); return {i:`${a}`, o:`${String(a)[0]}`}; } },
+      { t: "Cộng 5", d: "In ra N + 5", gen: () => { let a=randInt(1,100); return {i:`${a}`, o:`${a+5}`}; } },
+      { t: "Nhân 10", d: "In ra N * 10", gen: () => { let a=randInt(1,100); return {i:`${a}`, o:`${a*10}`}; } }
+    ];
   }
 
-  categoryTemplates.forEach((tpl) => {
+  // Sử dụng đúng 20 mẫu cho mỗi topic
+  for (let i = 0; i < 20; i++) {
+    let tpl = templates[i % templates.length];
+    let tests = [];
+    let numTests = randInt(10, 15);
+    for(let t = 0; t < numTests; t++) {
+      tests.push(tpl.gen());
+    }
+
+    let pDesc = tpl.d.includes("<h4>") ? tpl.d : `<p>${tpl.d}</p><h4>Dữ liệu vào:</h4><ul><li>Một dòng dữ liệu theo yêu cầu.</li></ul><h4>Dữ liệu ra:</h4><ul><li>Kết quả.</li></ul>`;
+
     allExercises.push({
-      title: tpl.title,
+      title: `${tpl.t}`,
       topicId: topic._id,
       language: lang,
       difficulty: difficulties[Math.floor(Math.random() * difficulties.length)],
       source: sources[Math.floor(Math.random() * sources.length)],
-      description: tpl.desc,
+      description: pDesc,
       starterCode: starter,
-      testCases: tpl.tests.map(t => ({ input: t.i, expectedOutput: t.o })),
+      testCases: tests.map(t => ({ input: t.i, expectedOutput: t.o })),
       points: Math.floor(Math.random() * 20) + 10,
       tags: [tags[Math.floor(Math.random() * tags.length)]]
     });
-  });
+  }
 };
 
 const seedDB = async () => {
