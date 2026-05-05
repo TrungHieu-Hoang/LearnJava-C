@@ -160,6 +160,7 @@ const Dashboard = () => {
           {submissionResult ? (
             <SubmissionResult 
               submission={submissionResult} 
+              exercise={activeExercise}
               onBack={() => setSubmissionResult(null)} 
             />
           ) : activeExercise ? (
