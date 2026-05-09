@@ -20,7 +20,7 @@ CodeCamp là một nền tảng học lập trình full-stack toàn diện, đư
 ### Hệ thống Server (Backend)
 - **Hỗ trợ 4 ngôn ngữ cốt lõi:** Java, C++, C, và Python 3.
 - **Code Runner an toàn:** Hệ thống tự động tạo môi trường ảo thông qua `child_process`, giới hạn thời gian (Timeout 5s) và biên dịch mã nguồn trực tiếp trên máy chủ.
-- **Seed Data có sẵn:** Script tạo sẵn cấu trúc khóa học và hơn 80 bài tập mẫu đa dạng độ khó (20 bài/ngôn ngữ).
+- **Seed Data có sẵn:** Script tạo sẵn cấu trúc khóa học và bài tập mẫu đa dạng độ khó.
 - **Bảo mật JWT:** Hệ thống xác thực người dùng bằng JSON Web Token (JWT) và mã hóa mật khẩu với `bcryptjs`.
 
 ---
@@ -34,34 +34,6 @@ CodeCamp là một nền tảng học lập trình full-stack toàn diện, đư
 
 ---
 
-## 🚀 Hướng dẫn cài đặt và khởi chạy (Localhost)
-
-### 1. Cấu hình Backend
-```bash
-# 1. Di chuyển vào thư mục backend
-cd server
-
-# 2. Cài đặt thư viện
-npm install
-
-# 3. Tạo dữ liệu mẫu (Sẽ tự động nạp bài giảng Java, C++, C, Python)
-npm run seed
-
-# 4. Khởi động API Server
-npm run dev
-```
-
-### 2. Cấu hình Frontend
-```bash
-# 1. Di chuyển vào thư mục frontend
-cd client
-
-# 2. Cài đặt thư viện React
-npm install
-
-# 3. Khởi chạy giao diện Web
-npm run dev
----
 ## 📖 Hướng dẫn sử dụng cho người học
 
 1. **Lộ trình học:** Ở menu bên trái, chọn ngôn ngữ bạn muốn học (Java, C++, C, Python). Đi tuần tự từ trên xuống dưới. Bài "Bài 0: Hướng dẫn & Làm quen" sẽ hướng dẫn bạn cú pháp khai báo cơ bản nhất của từng ngôn ngữ.

@@ -313,7 +313,39 @@ const generateMoreExercisesForTopic = (topic, allExercises) => {
       };
     });
   }
-  // 6. CÁC TOPIC KHÁC (Hàm, Chuỗi, Struct, Exceptions, OOP...)
+  // 6. STRUCT
+  else if (tTitle.includes('struct') || tTitle.includes('cấu trúc')) {
+    templates = [
+      { t: "Khoảng cách 2 điểm", d: "Cho 2 điểm A(x1, y1) và B(x2, y2). Tính bình phương khoảng cách giữa A và B", gen: () => { let x1=randInt(-10,10),y1=randInt(-10,10),x2=randInt(-10,10),y2=randInt(-10,10); return {i:`${x1} ${y1}\n${x2} ${y2}`, o:`${(x1-x2)**2 + (y1-y2)**2}`}; } },
+      { t: "Trung điểm đoạn thẳng", d: "Cho 2 điểm A(x1, y1) và B(x2, y2). In ra tọa độ trung điểm (làm tròn xuống). Định dạng: x y", gen: () => { let x1=randInt(-10,10),y1=randInt(-10,10),x2=randInt(-10,10),y2=randInt(-10,10); return {i:`${x1} ${y1}\n${x2} ${y2}`, o:`${Math.floor((x1+x2)/2)} ${Math.floor((y1+y2)/2)}`}; } },
+      { t: "Cộng 2 phân số", d: "Cho 2 phân số a/b và c/d (b,d > 0). Tính tổng và in ra tử số và mẫu số (chưa cần rút gọn, quy đồng chéo a*d+b*c và b*d)", gen: () => { let a=randInt(1,10),b=randInt(1,10),c=randInt(1,10),d=randInt(1,10); return {i:`${a} ${b}\n${c} ${d}`, o:`${a*d+b*c} ${b*d}`}; } },
+      { t: "Trừ 2 phân số", d: "Cho 2 phân số a/b và c/d (b,d > 0). Tính hiệu a/b - c/d (chưa cần rút gọn, in a*d-b*c và b*d)", gen: () => { let a=randInt(1,10),b=randInt(1,10),c=randInt(1,10),d=randInt(1,10); return {i:`${a} ${b}\n${c} ${d}`, o:`${a*d-b*c} ${b*d}`}; } },
+      { t: "Nhân 2 phân số", d: "Cho 2 phân số a/b và c/d. Tính tích a/b * c/d (chưa cần rút gọn)", gen: () => { let a=randInt(1,10),b=randInt(1,10),c=randInt(1,10),d=randInt(1,10); return {i:`${a} ${b}\n${c} ${d}`, o:`${a*c} ${b*d}`}; } },
+      { t: "Cấu trúc Sinh Viên 1", d: "Sinh viên có Điểm Toán và Điểm Văn. In ra Tổng điểm", gen: () => { let m=randInt(0,10),v=randInt(0,10); return {i:`${m} ${v}`, o:`${m+v}`}; } },
+      { t: "Cấu trúc Sinh Viên 2", d: "Sinh viên có mã SV (số nguyên) và Tuổi. In ra: Mã SV - Tuổi", gen: () => { let id=randInt(1000,9999), age=randInt(18,25); return {i:`${id} ${age}`, o:`${id} - ${age}`}; } },
+      { t: "Chu vi Hình Chữ Nhật", d: "Hình chữ nhật được định nghĩa bởi chiều dài và chiều rộng. Tính chu vi", gen: () => { let w=randInt(1,50),h=randInt(1,50); return {i:`${w} ${h}`, o:`${2*(w+h)}`}; } },
+      { t: "Diện tích Hình Chữ Nhật", d: "Hình chữ nhật được định nghĩa bởi chiều dài và chiều rộng. Tính diện tích", gen: () => { let w=randInt(1,50),h=randInt(1,50); return {i:`${w} ${h}`, o:`${w*h}`}; } },
+      { t: "Cấu trúc Hình Tròn", d: "Hình tròn có bán kính R. Tính và in ra phần nguyên của Chu vi (pi = 3.14)", gen: () => { let r=randInt(1,20); return {i:`${r}`, o:`${Math.floor(2*3.14*r)}`}; } },
+      { t: "Diện tích Hình Tròn", d: "Hình tròn bán kính R. In ra phần nguyên của Diện tích (pi = 3.14)", gen: () => { let r=randInt(1,20); return {i:`${r}`, o:`${Math.floor(3.14*r*r)}`}; } },
+      { t: "So sánh 2 Sinh viên", d: "Mỗi sinh viên có mã SV và điểm GPA. In ra mã SV có GPA cao hơn. Nếu bằng in mã nhỏ hơn.", gen: () => { let id1=randInt(100,500),g1=randInt(1,10),id2=randInt(501,999),g2=randInt(1,10); let win=g1>g2?id1:(g2>g1?id2:Math.min(id1,id2)); return {i:`${id1} ${g1}\n${id2} ${g2}`, o:`${win}`}; } },
+      { t: "Cấu trúc Thời gian 1", d: "Thời gian gồm Giờ và Phút. Cho 1 mốc thời gian, cộng thêm 1 giờ và in ra Giờ Phút mới", gen: () => { let h=randInt(0,22),m=randInt(0,59); return {i:`${h} ${m}`, o:`${h+1} ${m}`}; } },
+      { t: "Cấu trúc Thời gian 2", d: "Thời gian gồm Giờ, Phút, Giây. In ra tổng số giây tính từ 00:00:00", gen: () => { let h=randInt(0,23),m=randInt(0,59),s=randInt(0,59); return {i:`${h} ${m} ${s}`, o:`${h*3600+m*60+s}`}; } },
+      { t: "Khoảng cách đến gốc tọa độ", d: "Điểm A(x, y). Tính bình phương khoảng cách đến gốc tọa độ (0,0)", gen: () => { let x=randInt(-20,20),y=randInt(-20,20); return {i:`${x} ${y}`, o:`${x*x+y*y}`}; } },
+      { t: "Phân số đảo ngược", d: "Cho phân số a/b (a>0). In ra nghịch đảo b/a (in b a)", gen: () => { let a=randInt(1,100),b=randInt(1,100); return {i:`${a} ${b}`, o:`${b} ${a}`}; } },
+      { t: "Cộng 2 vector", d: "Cho 2 vector (x1, y1) và (x2, y2). Tính vector tổng (x1+x2, y1+y2)", gen: () => { let x1=randInt(-10,10),y1=randInt(-10,10),x2=randInt(-10,10),y2=randInt(-10,10); return {i:`${x1} ${y1}\n${x2} ${y2}`, o:`${x1+x2} ${y1+y2}`}; } },
+      { t: "Nhân vô hướng vector", d: "Cho 2 vector (x1, y1) và (x2, y2). Tính tích vô hướng x1*x2 + y1*y2", gen: () => { let x1=randInt(-10,10),y1=randInt(-10,10),x2=randInt(-10,10),y2=randInt(-10,10); return {i:`${x1} ${y1}\n${x2} ${y2}`, o:`${x1*x2+y1*y2}`}; } },
+      { t: "Kiểm tra điểm thuộc hình chữ nhật", d: "HCN có gốc trái dưới (0,0), chiều dài w, chiều cao h. Điểm A(x, y). In YES nếu A nằm trong/trên cạnh, NO nếu nằm ngoài.", gen: () => { let w=randInt(5,20),h=randInt(5,20),x=randInt(-5,25),y=randInt(-5,25); let isInside = (x>=0 && x<=w && y>=0 && y<=h); return {i:`${w} ${h}\n${x} ${y}`, o:isInside?"YES":"NO"}; } },
+      { t: "Tìm điểm xa gốc tọa độ nhất", d: "Cho 2 điểm A(x1, y1) và B(x2, y2). In ra 1 nếu A xa hơn, 2 nếu B xa hơn, 0 nếu bằng nhau.", gen: () => { let x1=randInt(-10,10),y1=randInt(-10,10),x2=randInt(-10,10),y2=randInt(-10,10); let d1=x1*x1+y1*y1, d2=x2*x2+y2*y2; let res = (d1>d2) ? 1 : (d1<d2 ? 2 : 0); return {i:`${x1} ${y1}\n${x2} ${y2}`, o:`${res}`}; } }
+    ];
+    templates = templates.map(t => {
+      return {
+        t: t.t,
+        d: `<p>${t.d}</p><h4>Dữ liệu vào:</h4><ul><li>Dữ liệu được cấp trên 1 hoặc nhiều dòng (theo yêu cầu).</li></ul><h4>Dữ liệu ra:</h4><ul><li>Kết quả của bài toán.</li></ul>`,
+        gen: t.gen
+      };
+    });
+  }
+  // 7. CÁC TOPIC KHÁC (Hàm, Chuỗi, Exceptions, OOP...)
   else {
     templates = [
       { t: "Mã hóa đơn giản", d: "Cho N. Trả về N + 100", gen: () => { let a=randInt(1,100); return {i:`${a}`, o:`${a+100}`}; } },
